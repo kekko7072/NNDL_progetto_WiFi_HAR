@@ -17,20 +17,20 @@ results rest on a heavy, hand-engineered front-end: the paper's own ablation
 shows that replacing the strongest-path sanitization with the standard
 reference-antenna method makes the \emph{same} CNN collapse to $39$--$60\%$ on
 the unseen sets, i.e.\ much of the robustness is carried by the pre-processing
-rather than by the learned representation. Our work keeps the minimal front-end (no
-strongest-path sanitization) and asks how much cross-domain robustness can be
-recovered elsewhere: on the \emph{representation} side (contrastive
-pre-training) and on the \emph{decision} side, by re-implementing SHARP's
-antenna fusion---which, unlike the sanitization step, costs nothing at training
-time and turns out to be worth more than any other change we made.
+rather than the learned representation. Our work keeps the minimal front-end
+and asks how much cross-domain robustness can be recovered elsewhere: on the
+\emph{representation} side (contrastive pre-training) and on the
+\emph{decision} side, by re-implementing SHARP's antenna fusion---which,
+unlike sanitization, costs nothing at training time and turns out to be worth
+more than any other change we made.
 
 \textbf{Contrastive representation learning.}
 Contrastive methods learn representations by pulling together ``views'' that
 should be similar and pushing apart those that should differ.
-SimCLR~\cite{simclr} established the self-supervised recipe: two augmentations of
-an image form a positive pair, all other images in the batch are negatives, and
-an encoder is trained with a temperature-scaled InfoNCE loss on $L_2$-normalized
-embeddings. Supervised Contrastive Learning (SupCon)~\cite{supcon} extends it to
+SimCLR~\cite{simclr} established the self-supervised recipe of contrasting two
+augmented views against in-batch negatives with a temperature-scaled InfoNCE
+loss on $L_2$-normalized embeddings. Supervised Contrastive Learning
+(SupCon)~\cite{supcon} extends it to
 the labelled setting---\emph{all} samples sharing the anchor's label become
 positives---producing tighter, more class-consistent clusters than cross-entropy.
 We adopt SupCon because its notion of ``positive'' maps onto our goal: two

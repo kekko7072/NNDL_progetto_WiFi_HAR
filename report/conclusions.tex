@@ -5,29 +5,26 @@
 
 Starting from a baseline Wi-Fi HAR pipeline under a strict cross-domain protocol
 ($48.2\%$ on unseen environments), we implemented and measured four strategies
-one at a time: a supervised-contrastive representation ($+4.9$ points, with a
-t-SNE confirming environment-invariance), a slower optimizer schedule ($+3.1$),
-an overlapping sliding window ($+11.1$) and multi-antenna soft decision fusion
-($+12.8$). The last two compose and take the \emph{same} $128{,}535$-parameter
-network to $\mathbf{72.1\%}$, above the single-component ablation of the
-reference system~\cite{sharp} on every unseen set.
-
-Two of them cost almost nothing at training time---a stride constant and a
-probability average over receiver diversity the dataset already contains---which
-makes them the first things to try in a new deployment. The contrastive encoder
-is conditional: it helps when labelled windows are scarce and stops helping once
-the front-end supplies ten times more, so we read it as a data-efficiency
-mechanism rather than a substitute for a good front-end. Still missing: the
+one at a time: a supervised-contrastive representation ($+4.9$), a slower
+optimizer schedule ($+3.1$), an overlapping sliding window ($+11.9$) and
+multi-antenna soft decision fusion ($+12.6$). The last two compose and take
+the \emph{same} $128{,}535$-parameter
+network to $\mathbf{72.7\%}$, above the single-component ablation of the
+reference system~\cite{sharp} on every unseen set, at almost no training
+cost---a stride constant and a probability average over receiver diversity the
+dataset already contains. The contrastive encoder is conditional: a
+data-efficiency mechanism, not a front-end substitute. Still missing: the
 strongest-path sanitization behind most of the remaining gap, multi-seed runs,
-and fusion on top of the frozen probe.
+and fusion on top of the frozen probe with the contrastive stage re-tuned at
+$10^{-3}$.
 
 \paragraph{What we learned and difficulties encountered}
-The strict environment-based split changes the story: modest-looking numbers are
-the honest cost of never seeing the test environment, which a random split would
-hide. Three results were counter-intuitive---training \emph{less} well
-generalized \emph{better}, fine-tuning the contrastive encoder \emph{hurt}, and
-the largest gains came from the two cheapest changes once the pipeline carried a
+The strict environment-based split explains the modest numbers: never seeing
+the test environment is an honest cost a random split would hide. Three
+results were counter-intuitive---training \emph{less} well generalized
+\emph{better}, fine-tuning the contrastive encoder \emph{hurt}, and the
+largest gains came from the two cheapest changes once the pipeline carried a
 group identifier. The main difficulties were getting SupCon pre-training to
-converge (the loss barely moved), the run-to-run variance of a small model
-trained on one environment, and the memory cost of overlapping windows, which
-forced a pre-allocating loader before the $91\%$-overlap front-end could run.
+converge (the loss barely moved), run-to-run variance on one environment, and
+the memory cost of overlapping windows, which forced a pre-allocating loader
+before the $91\%$-overlap front-end could run.

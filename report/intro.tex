@@ -32,29 +32,27 @@ accuracy figure is attributable to one design decision (\tab{tab:versions}). The
 contributions are:
 \begin{itemize}
   \item \textbf{Baseline (M.~Carraro).} A faithful plain-PyTorch reimplementation
-  of the dataset pipeline and of the baseline Inception-style CNN, with a
-  cross-domain protocol (train on $S1$, test on $S2$--$S7$) and a
-  per-measurement-set error breakdown.
+  of the dataset pipeline and baseline Inception-style CNN, with a cross-domain
+  protocol (train on $S1$, test on $S2$--$S7$) and a per-set error breakdown.
   \item \textbf{Contrastive representation (F.~Vezzani).} A batch-normalized
   encoder pre-trained with a supervised-contrastive loss and domain-randomization
-  augmentations, evaluated with a linear probe on the frozen features. It
-  improves every set when training data is scarce---and, as we show, stops
-  helping once it is not.
-  \item \textbf{Multi-antenna decision fusion.} A group identifier that survives
-  the whole data pipeline recovers which windows are the \emph{same} physical
-  time window seen by the four antennas, so their predictions can be fused by
+  augmentations, evaluated with a linear probe on the frozen features: it
+  improves every set when training data is scarce, and stops helping once it is
+  not.
+  \item \textbf{Multi-antenna decision fusion.} A group identifier threaded
+  through the pipeline recovers which windows are the \emph{same} physical time
+  window seen by the four antennas, so their predictions can be fused by
   averaging class probabilities: $+10$ to $+13$ points in both data regimes, with
   no retraining.
   \item \textbf{Front-end and optimization engineering.} A sliding window at the
   stride used by the SHARP authors ($30$ samples, $91\%$ overlap) replaces the
-  na\"ive segmentation---$+11.1$ points on its own, affordable only through a
-  two-pass, memory-bounded dataset builder; and a controlled comparison of
-  learning-rate and early-stopping settings shows that, with a single training
-  environment, fitting the training set better does \emph{not} imply generalizing
-  better.
+  na\"ive segmentation---$+11.9$ points on its own, affordable only through a
+  two-pass, memory-bounded dataset builder; a controlled comparison of optimizer
+  schedules shows that, with a single training environment, fitting the training
+  set better does \emph{not} imply generalizing better.
 \end{itemize}
 Combining the last two takes the same architecture from $48.2\%$ to
-$\mathbf{72.1\%}$. We use the full SHARP system~\cite{sharp} as the reference
+$\mathbf{72.7\%}$. We use the full SHARP system~\cite{sharp} as the reference
 upper bound and discuss, quantitatively, which part of the gap each strategy
 removes and which part is left.
 

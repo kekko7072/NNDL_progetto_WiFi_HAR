@@ -6,6 +6,7 @@ All numbers are read off the stored outputs of the shipped notebooks:
   baseline, sliding window (stride 30)
   same sliding-window model, 4-antenna soft decision fusion
 """
+import os
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -16,8 +17,8 @@ SETS = ["S2", "S3", "S4", "S5", "S6", "S7", "Overall"]
 SERIES = [
     ("baseline, non-overlapping", [45.5, 51.4, 48.5, 47.5, 48.1, 52.3, 48.2], "#0072B2"),
     ("+ SupCon linear probe",     [51.1, 59.7, 51.9, 52.9, 51.3, 58.2, 53.1], "#009E73"),
-    ("baseline, sliding window",  [60.8, 61.6, 56.9, 57.4, 57.4, 64.0, 59.3], "#D55E00"),
-    ("+ 4-antenna fusion",        [77.9, 75.2, 66.2, 66.0, 72.7, 70.9, 72.1], "#8C6BB1"),
+    ("baseline, sliding window",  [61.6, 63.3, 57.1, 58.0, 58.3, 64.7, 60.1], "#D55E00"),
+    ("+ 4-antenna fusion",        [77.1, 77.3, 66.4, 66.4, 75.2, 70.7, 72.7], "#8C6BB1"),
 ]
 
 plt.rcParams.update({
@@ -62,6 +63,6 @@ ax.legend(ncol=2, fontsize=5.8, frameon=False, loc="upper center",
           columnspacing=1.2, borderaxespad=0.0)
 
 fig.tight_layout(pad=0.3)
-out = "/Users/francescovezzani/Desktop/Neural-Networks-Deep-Learning/Project/report/figures/perset_accuracy.png"
+out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "perset_accuracy.png")
 fig.savefig(out, bbox_inches="tight", pad_inches=0.02)
 print("wrote", out)

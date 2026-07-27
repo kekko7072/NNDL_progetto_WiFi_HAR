@@ -56,18 +56,18 @@ sliding window and fusion---compose into our best configuration.
     Contrastive &
       augmentations $+$ BN encoder with global average pooling $+$ SupCon loss;
       linear probe on the frozen encoder
-      & $+4.9$ \newline ($-1.0$ sliding)\\[2pt]
+      & $+4.9$ \newline ($-0.6$ sliding)\\[2pt]
     Slow schedule &
       Adam $10^{-4}$, patience $5$, budget $100$; nothing else changes
       & $+3.1$\\[2pt]
     Sliding window &
       stride $30$ ($91\%$ overlap, $152{,}320$ windows); two-pass
       pre-allocating loader, splits built separately; patience raised to $12$
-      & $+11.1$\\[2pt]
+      & $+11.9$\\[2pt]
     Antenna fusion &
       group id emitted by the loader and carried through the split; softmax and
       per-group probability average at inference, same weights
-      & $\mathbf{+12.8}$ \newline ($+10.2$ non-ov.)\\
+      & $\mathbf{+12.6}$ \newline ($+10.2$ non-ov.)\\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -125,11 +125,9 @@ loader collected per-file arrays in a list and called \texttt{np.concatenate},
 holding list \emph{and} result in RAM at once---affordable at $1.8$\,GB, not at
 $20$\,GB. The rewritten loader makes two passes: the first counts the windows
 each trace will produce, the second fills one pre-allocated \texttt{float32}
-array and frees each trace as soon as it is windowed. It also takes the
-environments to load, so train/val and test arrays come from two independent
-calls rather than slicing one large array, and the copy left by
-\texttt{train\_test\_split} is deleted explicitly. Peak memory is roughly halved
-and the windows are identical.
+array and frees each trace as soon as it is windowed, loading train/val and
+test as two independent calls and deleting the \texttt{train\_test\_split}
+copy explicitly. Peak memory is roughly halved and the windows are identical.
 
 \subsection{Cross-domain split}
 Following the SHARP protocol the split is by environment, never random: $S1$
@@ -211,18 +209,17 @@ accuracy plateaus near $0.52$. The \emph{slow} schedule ($10^{-4}$,
 patience~$5$, budget $100$) runs for $41$ epochs with the two curves almost on
 top of each other and stops at a training accuracy of only $0.575$: the model has
 not yet fitted its own training set. Reading that as underfitting, the
-\emph{adopted} schedule keeps $10^{-3}$ but raises patience to $12$, so a plateau
+\emph{adopted} schedule keeps $10^{-3}$ but raises patience to $12$: a plateau
 no longer ends training prematurely---which matters at stride~$30$, where each
-epoch is an order of magnitude slower; on that data it reaches $0.756$ training
+epoch is an order of magnitude slower; on that data it reaches $0.750$ training
 accuracy and stops at epoch~$27$.
 
 \subsection{Contrastive extension: Supervised Contrastive Learning (F.~Vezzani)}
 \label{sec:contrastive}
 
 \subsubsection{Motivation and augmentations}
-Plain cross-entropy on a single environment pushes nothing towards
-domain-invariant features. Following the \emph{contrastive / self-supervised}
-direction suggested in the project proposal, we implement \emph{Supervised
+Following the \emph{contrastive / self-supervised} direction suggested in the
+project proposal, we implement \emph{Supervised
 Contrastive Learning} (SupCon)~\cite{supcon}: an \emph{encoder} is trained so
 that two windows of the \emph{same activity} are pulled together and windows of
 different activities pushed apart, \emph{whatever environment, person or antenna
@@ -230,12 +227,10 @@ they come from}; a linear classifier is then fit on the frozen representation
 (\emph{linear probe}). Each window needs two augmented ``views'' that keep the
 activity intact but perturb nuisance factors---a light domain randomization. All
 transforms run on-GPU on a whole batch: \textbf{amplitude scaling}
-($\mathcal{U}(0.8,1.2)$, rooms and distances reflect the signal with different
+($\mathcal{U}(0.8,1.2)$, mimicking rooms/distances at different signal
 strength), \textbf{additive Gaussian noise} ($\sigma=0.05$), \textbf{circular
-time shift} ($\pm40$ samples, the activity does not depend on where in the window
-it starts) and \textbf{time/Doppler masking} (SpecAugment-style, a zeroed band of
-$40$ time samples and $15$ velocity bins, forcing the encoder to use the whole
-time--velocity pattern).
+time shift} ($\pm40$ samples) and \textbf{time/Doppler masking}
+(SpecAugment-style, a zeroed band of $40$ time samples and $15$ velocity bins).
 
 \subsubsection{Encoder and projection head}
 The encoder $f(\cdot)$ is a deeper, batch-normalized evolution of the baseline's
