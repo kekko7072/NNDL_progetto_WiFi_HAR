@@ -5,18 +5,16 @@
 
 All numbers come from the stored notebook outputs, one run per configuration,
 under the same protocol: train on $S1$, test on the unseen $S2$--$S7$.
-\tab{tab:compare} collects them per measurement set, \fig{fig:perset} plots the
-same data, and \tab{tab:versions} maps each column to the change that produced
-it.
+\tab{tab:compare} collects them per measurement set and \fig{fig:perset} plots
+them; \tab{tab:versions} maps each column to the change that produced it.
 
 \subsection{Baseline}
 On the pooled unseen test set the baseline reaches $\mathbf{48.2\%}$ accuracy
-(test loss $1.052$), ranging from $45.5\%$ ($S2$) to $52.3\%$ ($S7$). Its
-confusion matrix (\fig{fig:cm}\,(a)) shows two dominant error modes:
-\emph{sitting still} is absorbed by \emph{empty} ($L\!\rightarrow\!E$:
-$0.76$)---both are near-static and concentrate energy at zero Doppler
-velocity---and \emph{running}/\emph{walking} are heavily confused with each other
-($W\!\rightarrow\!R$: $0.39$, $R\!\rightarrow\!W$: $0.28$).
+(test loss $1.052$), from $45.5\%$ ($S2$) to $52.3\%$ ($S7$). Its confusion matrix
+(\fig{fig:cm}\,(a)) shows two dominant error modes: \emph{sitting still} is
+absorbed by \emph{empty} ($L\!\rightarrow\!E$: $0.76$), both being near-static and
+concentrated at zero Doppler velocity, and \emph{running}/\emph{walking} are
+heavily confused with each other ($0.39$ and $0.28$).
 
 \subsection{Contrastive representation}
 The linear probe on the frozen SupCon encoder raises overall accuracy to
@@ -57,12 +55,11 @@ while fine-tuning re-overfits the single training environment.
     \includegraphics[width=\textwidth]{confusion_v3_fused.png}
     \caption{$+$ $4$-antenna fusion}
   \end{subfigure}
-  \caption{Row-normalized confusion matrices on all unseen test environments,
-  one per configuration. The contrastive representation (b) softens the
-  low-motion $L\!\rightarrow\!E$ confusion of the baseline (a); fusion (d) raises
-  every motion class of the model in (c) with the same weights, but leaves
-  \emph{sitting}$\rightarrow$\emph{empty} in place---the antennas agree with each
-  other when there is no motion to disagree about.}
+  \caption{Row-normalized confusion matrices on all unseen test environments, one
+  per configuration. The contrastive representation (b) softens the
+  $L\!\rightarrow\!E$ confusion of the baseline (a); fusion (d) raises every motion
+  class of (c) with the same weights, but leaves
+  \emph{sitting}$\rightarrow$\emph{empty} in place.}
   \label{fig:cm}
 \end{figure*}
 
@@ -90,12 +87,11 @@ can be bought with an optimizer setting alone, so single-run gains of a few
 points here are fragile.
 
 \subsection{Multi-antenna decision fusion}
-Fusion is the largest single improvement we measured. Averaging the four
-per-antenna probability vectors (\eq{eq:fusion}) lifts the \emph{same} model from
-$51.3\%$ to $\mathbf{61.5\%}$: $+10.2$ points overall, with per-set gains between
-$+6.4$ ($S6$) and $+17.4$ ($S7$) and no set left behind (\fig{fig:perset}). It
-costs one softmax and one group-average at inference---no retraining, no extra
-parameters.
+Averaging the four per-antenna probability vectors (\eq{eq:fusion}) lifts the
+\emph{same} model from $51.3\%$ to $\mathbf{61.5\%}$: $+10.2$ points overall,
+with per-set gains between $+6.4$ ($S6$) and $+17.4$ ($S7$) and no set left
+behind (\fig{fig:perset}), for one softmax and one group-average at
+inference---no retraining, no extra parameters.
 
 The mechanism is visible in \fig{fig:cm}\,(c--d): fusion does not repair a
 broken class, it sharpens decisions the single-antenna model already leaned
@@ -121,15 +117,14 @@ representation, not to the decision rule.
 
 \subsection{Sliding-window front-end}
 \label{sec:sliding}
-This is the one change we cannot yet quantify: the notebook that adopts it as
-the default ships with its outputs cleared, and the $50\%$-overlap prototype was
-never executed end-to-end. The code does establish the mechanism and its cost:
-the same recordings yield $\approx\!10\times$ more training windows, at
-$\approx\!20$\,GB of resident memory and an epoch time an order of magnitude
-longer---exactly why the loader had to allocate once instead of concatenating.
-Whether those extra, strongly correlated windows convert into accuracy is left
-open; SHARP's own use of stride~$30$ suggests they help, but we report the change
-as implemented, not as measured.
+This is the one change we cannot yet quantify: the notebook adopting it as the
+default ships with its outputs cleared, and the $50\%$-overlap prototype was never
+executed end-to-end. The code does establish the mechanism and its cost---the
+same recordings yield $\approx\!10\times$ more windows, at $\approx\!20$\,GB of
+resident memory and an epoch time an order of magnitude longer, exactly why the
+loader had to allocate once instead of concatenating. Whether those correlated
+extra windows convert into accuracy is left open: SHARP's own use of stride~$30$
+suggests they help, but we report the change as implemented, not as measured.
 
 \subsection{Comparison with the SHARP paper}
 \tab{tab:compare} places our results next to the SHARP paper~\cite{sharp}: the
@@ -183,23 +178,21 @@ Ranked by measured effect, decision fusion ($+10.2$ points) dominates the
 contrastive representation ($+4.9$) and the optimizer schedule ($+3.1$). The
 ordering is itself a finding: the cheapest change---a few lines of
 post-processing over information already in the dataset---beat the one that cost
-the most design effort. It also matches SHARP's ablation, where accuracy grows
+the most design effort, consistently with SHARP's ablation, where accuracy grows
 monotonically with the number of fused antennas~\cite{sharp}.
 
 \paragraph{Why we are still far from SHARP}
 The gap is now essentially one component. SHARP uses the \emph{strongest}
-multipath component as phase reference, and its own ablation shows the standard
+multipath component as phase reference, and its ablation shows the standard
 reference-antenna method makes the \emph{same} CNN collapse from $>95\%$ to
 $39$--$60\%$ (\tab{tab:compare}, last column)---the band our models occupy, ours
-at its top. That is consistent with having reproduced the decision-level half of
-SHARP's robustness and none of its signal-processing half. A second, smaller
-factor is that training on one small environment makes every number
-high-variance.
+at its top: we have reproduced the decision-level half of SHARP's robustness and
+none of its signal-processing half. Training on one small environment also makes
+every number high-variance.
 
 \paragraph{The two remedies are complementary}
 The SupCon stage attacks domain shift on the \emph{representation} axis and, as
 the t-SNE shows, succeeds there; its residual errors are \emph{activity}
-confusions, exactly what fusion attacks. The obvious experiment left undone is
-\eq{eq:fusion} on top of the frozen SupCon probe with the sliding-window
-front-end: all three components exist in the released code, but no single run
-combines them.
+confusions, exactly what fusion attacks. The experiment left undone is
+\eq{eq:fusion} on top of the frozen probe with the sliding-window front-end: all
+three components exist in the released code, but no run combines them.

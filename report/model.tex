@@ -28,20 +28,19 @@ footing against the reference SHARP system~\cite{sharp};
 
 \subsection{The changes we evaluate}
 \label{sec:versions}
-Four modifications were implemented on top of that skeleton, each isolated so
-that its effect is attributable (\tab{tab:versions}): a different \emph{windowing}
-strategy, a \emph{group-aware} data pipeline enabling \emph{decision fusion}, a
+Four modifications were implemented on that skeleton, each isolated so that its
+effect is attributable (\tab{tab:versions}): a different \emph{windowing}
+strategy, a \emph{group-aware} pipeline enabling \emph{decision fusion}, a
 \emph{contrastive} representation, and a different \emph{optimizer schedule}.
 Only the first touches the data loader and only the third trains a new network;
-fusion is inference-time post-processing on an unchanged model, which is what
-makes its measured gain remarkable.
+fusion is post-processing on an unchanged model, which is what makes its measured
+gain remarkable.
 
 \begin{table}[t]
   \centering
-  \caption{The modifications evaluated on top of the baseline, the code each one
-  required, and the resulting cross-domain accuracy (train on $S1$, test on
-  $S2$--$S7$, one run). Each is measured against the reference configuration of
-  the first row, changing one thing at a time.}
+  \caption{The modifications evaluated, the code each required, and the resulting
+  cross-domain accuracy (train on $S1$, test on $S2$--$S7$, one run). Each is
+  measured against the reference configuration of the first row.}
   \label{tab:versions}
   \setlength{\tabcolsep}{3pt}
   \footnotesize
@@ -105,27 +104,17 @@ makes its measured gain remarkable.
     \draw[arr] (fus.south) -- (ev.north);
   \end{tikzpicture}%
   }
-  \caption{High-level processing pipeline. A shared front-end turns CSI traces
-  into Doppler windows tagged with a group id; the baseline chain classifies them
-  directly, the contrastive chain learns an environment-invariant representation
-  before a linear probe, and the fusion stage collapses the four per-antenna
-  decisions of one time window into one.}
+  \caption{Processing pipeline. A shared front-end turns CSI traces into Doppler
+  windows tagged with a group id; the baseline chain classifies them directly,
+  the contrastive chain learns an environment-invariant representation before a
+  linear probe, and fusion collapses the four per-antenna decisions of a time
+  window into one.}
   \label{fig:pipeline}
 \end{figure}
 
 \section{Signals and Features}
 \label{sec:model}
 \emph{(Dataset pipeline implemented by M.~Carraro.)}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{doppler_activities.png}
-  \caption{One Doppler-spectrogram window per activity (transposed: rows are the
-  $100$ velocity bins, columns the $340$ time samples). Low-motion classes
-  concentrate energy at zero velocity; \emph{running}/\emph{jumping} spread it
-  over a wide velocity range.}
-  \label{fig:activities}
-\end{figure}
 
 \subsection{The SHARP data}
 We use the pre-extracted Doppler traces released with the SHARP
@@ -163,27 +152,25 @@ neighbour can land on opposite sides of the random train/val split, making the
 validation loss optimistic and perturbing \emph{when} early stopping fires. The
 test figures are unaffected: the test set is a disjoint set of environments.
 
-\textbf{Group identifiers.} The four streams of one recording have identical
-length, so window~$k$ of each stream starts at the same sample $kS$ of the same
-event. To exploit this, the parser keeps the full recording token (\texttt{"J2"},
-repetition number included, not just the activity letter) and the loader emits a
-group id \texttt{env\_token\_k} per window: windows sharing it are the same
-physical time window seen by different antennas, which is what makes
-\secref{sec:fusion} possible. The identifier is carried through the environment
-split alongside the labels, and the test \texttt{DataLoader} uses
-\texttt{shuffle=False} so predictions stay aligned with it.
+\textbf{Group identifiers.} The four streams of a recording have identical
+length, so window~$k$ of each starts at the same sample $kS$ of the same event.
+To exploit this, the parser keeps the full recording token (\texttt{"J2"},
+repetition number included) and the loader emits a group id
+\texttt{env\_token\_k} per window: windows sharing it are the same physical time
+window seen by different antennas, which is what makes \secref{sec:fusion}
+possible. The id is carried through the split alongside the labels, and the test
+\texttt{DataLoader} uses \texttt{shuffle=False} to stay aligned with it.
 
-\textbf{A memory-bounded loader.} At $S=30$ the materialized windows no longer
-fit comfortably in a Colab runtime: the original loader accumulated per-file
-arrays in a list and called \texttt{np.concatenate}, holding list \emph{and}
-result in RAM at once---affordable at $1.8$\,GB, not at $\approx\!20$\,GB. The
-rewritten loader makes two passes: the first counts the windows each trace will
-produce, the second fills a single pre-allocated \texttt{float32} array and drops
-the reference to each trace as soon as it is windowed. It also takes the list of
-environments to load, so train/val and test arrays are built by two independent
-calls instead of being sliced out of one large array, and the copy left behind by
-\texttt{train\_test\_split} is deleted explicitly. Peak memory is roughly halved
-and the windows produced are identical.
+\textbf{A memory-bounded loader.} At $S=30$ the windows no longer fit
+comfortably in a Colab runtime: the original loader accumulated per-file arrays
+in a list and called \texttt{np.concatenate}, holding list \emph{and} result in
+RAM at once---affordable at $1.8$\,GB, not at $\approx\!20$\,GB. The rewritten
+loader makes two passes: the first counts the windows each trace will produce,
+the second fills one pre-allocated \texttt{float32} array and frees each trace as
+soon as it is windowed. It also takes the environments to load, so train/val and
+test arrays come from two independent calls instead of one large array being
+sliced, and the copy left by \texttt{train\_test\_split} is deleted explicitly.
+Peak memory is roughly halved and the windows are identical.
 
 \subsection{Cross-domain split}
 Following the SHARP protocol, the split is by environment, never random: the
@@ -259,18 +246,17 @@ Training uses cross-entropy, Adam, mini-batches of $64$ and \emph{early
 stopping}, restoring the lowest-validation-loss weights before testing.
 
 \textbf{Two optimizer schedules} were compared with everything else held fixed
-(\tab{tab:schedule}), because their effect turns out to be counter-intuitive. The
-\emph{fast} schedule ($\text{lr}=10^{-3}$, patience~$7$) stops at epoch~$13$
-(best validation loss $0.993$) and shows the classic overfitting signature in
-\fig{fig:curves}(a): training accuracy climbs to $0.60$ while validation accuracy
-plateaus near $0.52$. The \emph{slow} schedule ($\text{lr}=10^{-4}$,
-patience~$5$, budget $100$) instead runs for $41$ epochs with train and
-validation curves lying almost on top of each other (\fig{fig:curves}(b)) and
-stops at a training accuracy of only $\approx\!0.58$: the model has not yet
-fitted its own training set. Reading that as underfitting, the final
-configuration keeps $\text{lr}=10^{-3}$ but raises patience to $12$, so a
-temporary plateau no longer ends training prematurely---which matters more at
-stride~$30$, where each epoch is an order of magnitude slower.
+(\tab{tab:schedule}), because their effect is counter-intuitive. The \emph{fast}
+schedule ($\text{lr}=10^{-3}$, patience~$7$) stops at epoch~$13$ (best validation
+loss $0.993$) with the classic overfitting signature of \fig{fig:curves}(a):
+training accuracy climbs to $0.60$ while validation accuracy plateaus near
+$0.52$. The \emph{slow} schedule ($\text{lr}=10^{-4}$, patience~$5$, budget
+$100$) runs for $41$ epochs with the two curves almost on top of each other
+(\fig{fig:curves}(b)) and stops at a training accuracy of only $\approx\!0.58$:
+the model has not yet fitted its own training set. Reading that as underfitting,
+the final configuration keeps $\text{lr}=10^{-3}$ but raises patience to $12$, so
+a plateau no longer ends training prematurely---which matters at stride~$30$,
+where each epoch is an order of magnitude slower.
 
 \begin{table}[t]
   \centering
@@ -303,9 +289,9 @@ stride~$30$, where each epoch is an order of magnitude slower.
   \end{subfigure}
   \caption{Baseline train/validation accuracy under the two optimizer schedules.
   In (a) the training curve detaches from the validation one after $\approx\!6$
-  epochs---overfitting the single training environment. In (b) the two stay glued
-  together and stop at a training accuracy of $0.575$: the model is
-  \emph{under}-fitted, and yet generalizes better (\tab{tab:compare}).}
+  epochs (overfitting the single environment); in (b) the two stay glued together
+  and stop at a training accuracy of $0.575$---\emph{under}-fitted, and yet
+  generalizing better (\tab{tab:compare}).}
   \label{fig:curves}
 \end{figure}
 
@@ -344,12 +330,23 @@ parameters in parentheses):
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\columnwidth]{augment_views.png}
-  \caption{A window (\emph{left}) and two augmented views: scaling and noise
-  change the texture, the circular shift and the SpecAugment-style masks (dark
-  bands) hide parts of the pattern, while the activity signature (the horizontal
-  energy band) survives.}
-  \label{fig:aug}
+  \begin{subfigure}{\columnwidth}
+    \includegraphics[width=\textwidth]{doppler_activities.png}
+    \caption{one input window per activity}
+    \label{fig:activities}
+  \end{subfigure}\\[2pt]
+  \begin{subfigure}{\columnwidth}
+    \includegraphics[width=\textwidth]{augment_views.png}
+    \caption{a window and two augmented views}
+    \label{fig:aug}
+  \end{subfigure}
+  \caption{(a) One Doppler-spectrogram window per activity (transposed: rows are
+  the $100$ velocity bins, columns the $340$ time samples); low-motion classes
+  concentrate energy at zero velocity, \emph{running}/\emph{jumping} spread it
+  widely. (b) Scaling and noise change the texture and the circular shift and
+  SpecAugment-style masks (dark bands) hide parts of the pattern, while the
+  activity signature survives.}
+  \label{fig:data}
 \end{figure}
 
 \subsubsection{Encoder and projection head}
@@ -418,9 +415,9 @@ gracefully when a recording provides fewer than four streams. The reference pape
 does not detail its own fusion rule, so \eq{eq:fusion} is a standard
 instantiation of the idea rather than a byte-for-byte reproduction.
 
-Two implementation details make it correct: the group id must \emph{not} encode
-the stream index, so that the four antennas collide onto the same key; and the
-evaluation \texttt{DataLoader} must not shuffle, or the returned probabilities
-stop lining up with the stored ids and the average silently mixes unrelated
-windows. Fusion also changes the \emph{unit} of evaluation: accuracy is computed
-over $2577$ physical time windows instead of $10{,}308$ antenna-level ones.
+Two details make it correct: the group id must \emph{not} encode the stream
+index, so the four antennas collide onto one key; and the evaluation
+\texttt{DataLoader} must not shuffle, or the probabilities stop lining up with
+the stored ids and the average silently mixes unrelated windows. Fusion also
+changes the \emph{unit} of evaluation: $2577$ physical time windows instead of
+$10{,}308$ antenna-level ones.
