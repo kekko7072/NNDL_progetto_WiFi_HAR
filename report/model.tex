@@ -6,7 +6,7 @@
 All of our models cast Wi-Fi HAR as the classification of Doppler-spectrogram
 images and share the \emph{same} data front-end; they differ in \emph{how} the
 representation is learned and in \emph{how} the per-window decisions are
-combined (\fig{fig:pipeline}). The raw CSI Doppler traces are cut into fixed-size
+combined. The raw CSI Doppler traces are cut into fixed-size
 windows of shape $1\times340\times100$, one antenna at a time
 (\secref{sec:model}); from there the pipeline forks:
 \begin{itemize}
@@ -29,13 +29,12 @@ footing against the reference SHARP system~\cite{sharp};
 \subsection{The changes we evaluate}
 \label{sec:versions}
 Four modifications were implemented on that skeleton, each isolated so that its
-effect is attributable (\tab{tab:versions}): a different \emph{windowing}
-strategy, a \emph{group-aware} pipeline enabling \emph{decision fusion}, a
-\emph{contrastive} representation, and a different \emph{optimizer schedule}.
-Only the first touches the data loader and only the third trains a new network;
-fusion is post-processing on an unchanged model, which is what makes its measured
-gain remarkable. The two largest gains---the sliding window and fusion---compose,
-and their combination is our best configuration.
+effect is attributable (\tab{tab:versions}): a \emph{windowing} strategy, a
+\emph{group-aware} pipeline enabling \emph{decision fusion}, a \emph{contrastive}
+representation and an \emph{optimizer schedule}. Only the first touches the data
+loader and only the third trains a new network; fusion is post-processing on an
+unchanged model, which is what makes its gain remarkable. The two largest---the
+sliding window and fusion---compose into our best configuration.
 
 \begin{table}[t]
   \centering
@@ -73,115 +72,71 @@ and their combination is our best configuration.
   \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-  \centering
-  \resizebox{\columnwidth}{!}{%
-  \begin{tikzpicture}[
-    font=\footnotesize,
-    >={Stealth[length=2mm]},
-    box/.style={rectangle, rounded corners=2pt, draw=black!70, thick,
-                align=center, inner sep=4pt},
-    data/.style={box, fill=green!12, text width=44mm},
-    base/.style={box, fill=blue!12, text width=36mm},
-    cont/.style={box, fill=yellow!20, text width=44mm},
-    fuse/.style={box, fill=red!12, text width=50mm},
-    eval/.style={box, fill=orange!22, text width=50mm},
-    arr/.style={->, thick, black!65},
-  ]
-    \node[data] (win) at (0,0)
-      {Doppler windows $1\times340\times100$\\(per antenna, $+$ group id)};
-    \node[base] (bcnn) at (-3.8,-2.4)
-      {\textbf{Baseline (Carraro)}\\Inception CNN $+$ softmax};
-    \node[cont] (enc) at (3.8,-2.4)
-      {\textbf{Contrastive (Vezzani)}\\aug.\ $\to$ SupCon encoder\\$\to$ freeze $\to$ linear probe};
-    \node[fuse] (fus) at (0,-4.6)
-      {\textbf{Decision fusion} (optional)\\mean of the $4$ antenna probabilities};
-    \node[eval] (ev) at (0,-6.6)
-      {Cross-domain evaluation\\train $S1$ / test $S2$--$S7$};
-
-    \draw[arr] (win.south) -- (bcnn.north);
-    \draw[arr] (win.south) -- (enc.north);
-    \draw[arr] (bcnn.south) |- (fus.west);
-    \draw[arr] (enc.south) |- (fus.east);
-    \draw[arr] (fus.south) -- (ev.north);
-  \end{tikzpicture}%
-  }
-  \caption{Processing pipeline. A shared front-end turns CSI traces into Doppler
-  windows tagged with a group id; the baseline chain classifies them directly,
-  the contrastive chain learns an environment-invariant representation before a
-  linear probe, and fusion collapses the four per-antenna decisions of a time
-  window into one.}
-  \label{fig:pipeline}
-\end{figure}
-
 \section{Signals and Features}
 \label{sec:model}
 \emph{(Dataset pipeline implemented by M.~Carraro.)}
 
 \subsection{The SHARP data}
 We use the pre-extracted Doppler traces released with the SHARP
-dataset~\cite{csidataset} (IEEE~802.11ac, $80$\,MHz). Each trace is an array of
-shape $(T,100)$---$T$ time steps, $100$ Doppler-velocity bins---from a single
-receiving antenna (\texttt{stream\_1}\dots\texttt{stream\_4}) of a four-antenna
-monitor. The recordings map to seven \emph{measurement sets} $S1$--$S7$, each a
-distinct (environment, monitor position, person, day) combination. Only $S1$ is
-used for training; the others probe generalization to an unseen day ($S2$), an
-unseen person ($S3$), blocked line-of-sight ($S4$, $S5$), a different room
-($S6$), and the worst case of new room, day and person at once ($S7$).
+dataset~\cite{csidataset} (IEEE~802.11ac, $80$\,MHz): arrays of shape $(T,100)$
+---$T$ time steps, $100$ Doppler-velocity bins---one per receiving antenna
+(\texttt{stream\_1}\dots\texttt{stream\_4}) of a four-antenna monitor. They map to
+seven \emph{measurement sets} $S1$--$S7$, each a distinct (environment, monitor
+position, person, day) combination. Only $S1$ is used for training; the others
+probe generalization to an unseen day ($S2$), an unseen person ($S3$), blocked
+line-of-sight ($S4$, $S5$), a different room ($S6$), and new room, day and person
+at once ($S7$).
 
 \subsection{From traces to windows}
-To keep the setup comparable across \emph{all} environments we use the five core
-activities present everywhere: \textbf{E} (empty room), \textbf{J} (jumping),
-\textbf{L} (sitting still), \textbf{R} (running), \textbf{W} (walking), matching
-the five-class task of~\cite{sharp}. Each trace is cut into windows of
-$W_{\text{len}}=340$ time samples ($\approx 2$\,s) advancing by a stride $S$,
-plus a channel dimension: inputs of shape $1\times 340\times 100$
-(\fig{fig:activities}). Each antenna stream is an independent labelled sample, as
+We use the five core activities present in every environment---\textbf{E} (empty
+room), \textbf{J} (jumping), \textbf{L} (sitting still), \textbf{R} (running),
+\textbf{W} (walking)---matching the five-class task of~\cite{sharp}. Each trace
+is cut into windows of $W_{\text{len}}=340$ time samples ($\approx 2$\,s)
+advancing by a stride $S$, plus a channel dimension: inputs of shape
+$1\times340\times100$. Each antenna stream is an independent labelled sample, as
 SHARP does at training time; antenna identity is re-used only at \emph{decision}
 time (\secref{sec:fusion}).
 
 \textbf{Windowing strategy.} The reference configuration uses
 $S=W_{\text{len}}=340$, i.e.\ \emph{non-overlapping} windows: simplest, but
 wasteful---a trace of length $T$ yields only $\lfloor T/340\rfloor$ examples and
-any pattern straddling a boundary is cut in half. It gives $13{,}564$ windows,
-reasonably balanced (E:~$3012$, J:~$2160$, L:~$3056$, R:~$2684$, W:~$2652$). The
-alternative is a sliding window: after prototyping $S=170$ ($50\%$ overlap) we
-adopted $S=30$, the value hard-coded in the SHARP authors' own dataset script,
-i.e.\ $91\%$ overlap and $152{,}320$ windows---$11\times$ as many, from the same
-recordings. Overlapping windows are strongly correlated, so the number of
+any pattern straddling a boundary is cut in half. It gives $13{,}564$ windows
+(E:~$3012$, J:~$2160$, L:~$3056$, R:~$2684$, W:~$2652$). The alternative is a
+sliding window: after prototyping $S=170$ we adopted $S=30$, the value hard-coded
+in the SHARP authors' own dataset script---$91\%$ overlap and $152{,}320$ windows
+from the same recordings. They are strongly correlated, so the number of
 \emph{independent} examples grows far less than tenfold, and a window and its
-neighbour can land on opposite sides of the random train/val split, making the
-validation loss optimistic and perturbing \emph{when} early stopping fires. The
-test figures are unaffected: the test set is a disjoint set of environments.
+neighbour can fall on opposite sides of the random train/val split, making the
+validation loss optimistic and perturbing \emph{when} early stopping fires; the
+test figures are unaffected, the test environments being disjoint.
 
 \textbf{Group identifiers.} The four streams of a recording have identical
-length, so window~$k$ of each starts at the same sample $kS$ of the same event.
-To exploit this, the parser keeps the full recording token (\texttt{"J2"},
-repetition number included) and the loader emits a group id
-\texttt{env\_token\_k} per window: windows sharing it are the same physical time
-window seen by different antennas, which is what makes \secref{sec:fusion}
-possible. The id is carried through the split alongside the labels, and the test
-\texttt{DataLoader} uses \texttt{shuffle=False} to stay aligned with it.
+length, so window~$k$ of each starts at sample $kS$ of the same event. The parser
+therefore keeps the full recording token (\texttt{"J2"}, repetition number
+included) and the loader emits a group id \texttt{env\_token\_k} per window:
+windows sharing it are the same physical time window seen by different antennas,
+which is what makes \secref{sec:fusion} possible. The id travels through the
+split with the labels, and the test \texttt{DataLoader} uses
+\texttt{shuffle=False} to stay aligned with it.
 
-\textbf{A memory-bounded loader.} At $S=30$ the windows ($4.98$\,GB of
-train/val and $15.74$\,GB of test data) no longer fit comfortably in a Colab
-runtime: the original loader accumulated per-file arrays
-in a list and called \texttt{np.concatenate}, holding list \emph{and} result in
-RAM at once---affordable at $1.8$\,GB, not at $\approx\!20$\,GB. The rewritten
-loader makes two passes: the first counts the windows each trace will produce,
-the second fills one pre-allocated \texttt{float32} array and frees each trace as
-soon as it is windowed. It also takes the environments to load, so train/val and
-test arrays come from two independent calls instead of one large array being
-sliced, and the copy left by \texttt{train\_test\_split} is deleted explicitly.
-Peak memory is roughly halved and the windows are identical.
+\textbf{A memory-bounded loader.} At $S=30$ the windows ($4.98$\,GB train/val,
+$15.74$\,GB test) no longer fit comfortably in a Colab runtime: the original
+loader collected per-file arrays in a list and called \texttt{np.concatenate},
+holding list \emph{and} result in RAM at once---affordable at $1.8$\,GB, not at
+$20$\,GB. The rewritten loader makes two passes: the first counts the windows
+each trace will produce, the second fills one pre-allocated \texttt{float32}
+array and frees each trace as soon as it is windowed. It also takes the
+environments to load, so train/val and test arrays come from two independent
+calls rather than slicing one large array, and the copy left by
+\texttt{train\_test\_split} is deleted explicitly. Peak memory is roughly halved
+and the windows are identical.
 
 \subsection{Cross-domain split}
-Following the SHARP protocol, the split is by environment, never random: the
-folders of $S1$ ($S1a,S1b,S1c$) are used for training/validation and every other
-set is held out for testing; a random split would leak windows from the same
-person/room/day into both train and test and overestimate performance. Within
-$S1$ we keep $85\%$ for training and $15\%$ for validation (stratified),
-giving $2767$ / $489$ / $10{,}308$ windows for train / val / test at $S=340$ and
+Following the SHARP protocol the split is by environment, never random: $S1$
+($S1a,S1b,S1c$) is used for training/validation and every other set is held out;
+a random split would leak windows from the same person/room/day into both sides
+and overestimate performance. Within $S1$ we keep $85\%$ for training and $15\%$
+for validation (stratified), $2767$ / $489$ / $10{,}308$ windows for train / val / test at $S=340$ and
 $31{,}103$ / $5489$ / $115{,}728$ at $S=30$. Grouping the four antennas collapses
 the test windows to $2577$ and $28{,}932$ distinct physical time windows
 respectively---the number of decisions the fused evaluation reports.
@@ -214,9 +169,9 @@ respectively---the number of decisions the fused evaluation reports.
     \node[conv] (b3b) at (6.8,-2.0)  {CONV 6@(2$\times$2)\\S1-ReLU};
     \node[conv] (b3c) at (10.2,-2.0) {CONV 9@(4$\times$4)\\S2-ReLU};
     \node[op]   (cat) at (10.2,0.6)  {CONCAT\\(15 maps)};
-    \node[conv] (red) at (2.4,-4.7)  {CONV 3@(1$\times$1)\\S1-ReLU};
-    \node[op]   (fc)  at (6.4,-4.7)  {FLATTEN--DROPOUT(0.2)\\DENSE};
-    \node[term] (lab) at (10.2,-4.7) {ACTIVITY\\LABEL};
+    \node[conv] (red) at (2.4,-4.2)  {CONV 3@(1$\times$1)\\S1-ReLU};
+    \node[op]   (fc)  at (6.4,-4.2)  {FLATTEN--DROPOUT(0.2)\\DENSE};
+    \node[term] (lab) at (10.2,-4.2) {ACTIVITY\\LABEL};
 
     \draw[arr] (in.east) -- (mp.west);
     \draw[arr] (in.east) -- (b2.west);
@@ -226,7 +181,7 @@ respectively---the number of decisions the fused evaluation reports.
     \draw[arr] (mp.east)  -| (cat.north);
     \draw[arr] (b2.east)  -- (cat.west);
     \draw[arr] (b3c.north) -- (cat.south);
-    \draw[arr] (cat.east) -- ++(0.9,0) -- ++(0,-3.4) -| (red.north);
+    \draw[arr] (cat.east) -- ++(0.9,0) -- ++(0,-3.1) -| (red.north);
     \draw[arr] (red.east) -- (fc.west);
     \draw[arr] (fc.east)  -- (lab.west);
   \end{tikzpicture}%
@@ -237,20 +192,19 @@ respectively---the number of decisions the fused evaluation reports.
   \label{fig:baseline_arch}
 \end{figure}
 
-The baseline reproduces the simplified reduced-Inception module of SHARP
-(\cite{sharp}, Fig.~4), shown in \fig{fig:baseline_arch}: three parallel branches
-(max-pool, strided conv, three stacked convs) turn the $1\times340\times100$
-input into feature maps of identical size $170\times50$, concatenated on the
-channel axis ($1{+}5{+}9=15$), reduced to $3$ channels by a $1\times1$
-convolution, flattened, and classified by a dense layer after
-$\mathrm{Dropout}(0.2)$. The model has $\mathbf{128{,}535}$ trainable
-parameters---exactly the count reported for the SHARP baseline CNN~\cite{sharp}.
-Training uses cross-entropy, Adam, mini-batches of $64$ and \emph{early
-stopping}, restoring the lowest-validation-loss weights before testing.
+The baseline reproduces the reduced-Inception module of SHARP (\cite{sharp},
+Fig.~4), shown in \fig{fig:baseline_arch}: three parallel branches (max-pool,
+strided conv, three stacked convs) turn the $1\times340\times100$ input into
+feature maps of identical size $170\times50$, concatenated on the channel axis
+($1{+}5{+}9=15$), reduced to $3$ channels by a $1\times1$ convolution, flattened
+and classified by a dense layer after $\mathrm{Dropout}(0.2)$---
+$\mathbf{128{,}535}$ parameters, exactly the count reported for the SHARP
+baseline CNN. Training uses cross-entropy, Adam, mini-batches of $64$ and
+\emph{early stopping}, restoring the lowest-validation-loss weights.
 
 \textbf{Three optimizer schedules} were compared with architecture, seed, batch
-size and split held fixed, because their effect is counter-intuitive
-(\fig{fig:curves}). The \emph{fast} schedule ($\text{lr}=10^{-3}$, patience~$7$,
+size and split held fixed, because their effect is counter-intuitive. The
+\emph{fast} schedule ($\text{lr}=10^{-3}$, patience~$7$,
 budget $40$) stops at epoch~$13$ (best validation loss $0.993$) with the classic
 overfitting signature: training accuracy climbs to $0.601$ while validation
 accuracy plateaus near $0.52$. The \emph{slow} schedule ($10^{-4}$,
@@ -262,87 +216,40 @@ no longer ends training prematurely---which matters at stride~$30$, where each
 epoch is an order of magnitude slower; on that data it reaches $0.756$ training
 accuracy and stops at epoch~$27$.
 
-\begin{figure}[t]
-  \centering
-  \begin{subfigure}{0.32\columnwidth}
-    \includegraphics[width=\textwidth]{acc_fast.png}
-    \caption{fast, non-ov.}
-  \end{subfigure}\hfill
-  \begin{subfigure}{0.32\columnwidth}
-    \includegraphics[width=\textwidth]{acc_slow.png}
-    \caption{slow, non-ov.}
-  \end{subfigure}\hfill
-  \begin{subfigure}{0.32\columnwidth}
-    \includegraphics[width=\textwidth]{acc_slide.png}
-    \caption{adopted, sliding}
-  \end{subfigure}
-  \caption{Baseline train/validation accuracy under the three schedules:
-  (a) $10^{-3}$/patience~$7$, (b) $10^{-4}$/patience~$5$, both on non-overlapping
-  windows, and (c) $10^{-3}$/patience~$12$ on sliding windows. In (a) the training
-  curve detaches from the validation one after $\approx\!6$ epochs (overfitting
-  the single environment); in (b) the two stay glued together and stop
-  \emph{under}-fitted at $0.575$, and yet generalize better; in (c) the denser
-  windows let the model reach $0.756$ with validation accuracy $12$ points above
-  (a).}
-  \label{fig:curves}
-\end{figure}
-
 \subsection{Contrastive extension: Supervised Contrastive Learning (F.~Vezzani)}
 \label{sec:contrastive}
 
-\subsubsection{Motivation}
-The baseline is trained with plain cross-entropy on a single environment, so
-nothing pushes its features to be invariant across domains. Following the
-\emph{contrastive / self-supervised} direction suggested in the project proposal,
-we implement \emph{Supervised Contrastive Learning} (SupCon)~\cite{supcon}: an
-\emph{encoder} is trained so that two windows of the \emph{same activity} are
-pulled together and windows of different activities pushed apart, \emph{whatever
-environment, person or antenna they come from}. Since the objective depends only
-on activity identity, the encoder is driven to discard environment-specific
-nuisances; a tiny linear classifier is then fit on the frozen representation
-(\emph{linear probe}).
-
-\subsubsection{Domain-randomization augmentations}
-SupCon needs, for each window, two augmented ``views'' that keep the activity
-intact but perturb nuisance factors, acting as a light domain randomization. All
-transforms run on-GPU on a whole batch (default parameters in parentheses):
-\begin{itemize}
-  \item \textbf{amplitude scaling} by a per-window random gain
-  ($\mathcal{U}(0.8,1.2)$)---rooms/distances reflect the signal with different
-  strength;
-  \item \textbf{additive Gaussian noise} ($\sigma=0.05$);
-  \item \textbf{circular time shift} ($\pm 40$ samples)---the activity does not
-  depend on where in the $\approx 2$\,s window it starts;
-  \item \textbf{time and Doppler masking} (SpecAugment-style: a zeroed band of
-  $40$ time samples and $15$ velocity bins)---forces the encoder to use the whole
-  time--velocity pattern rather than any single region.
-\end{itemize}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{doppler_activities.png}
-  \caption{One Doppler-spectrogram window per activity (transposed: rows are the
-  $100$ velocity bins, columns the $340$ time samples). Low-motion classes
-  concentrate energy at zero velocity, \emph{running}/\emph{jumping} spread it
-  widely.}
-  \label{fig:activities}
-\end{figure}
+\subsubsection{Motivation and augmentations}
+Plain cross-entropy on a single environment pushes nothing towards
+domain-invariant features. Following the \emph{contrastive / self-supervised}
+direction suggested in the project proposal, we implement \emph{Supervised
+Contrastive Learning} (SupCon)~\cite{supcon}: an \emph{encoder} is trained so
+that two windows of the \emph{same activity} are pulled together and windows of
+different activities pushed apart, \emph{whatever environment, person or antenna
+they come from}; a linear classifier is then fit on the frozen representation
+(\emph{linear probe}). Each window needs two augmented ``views'' that keep the
+activity intact but perturb nuisance factors---a light domain randomization. All
+transforms run on-GPU on a whole batch: \textbf{amplitude scaling}
+($\mathcal{U}(0.8,1.2)$, rooms and distances reflect the signal with different
+strength), \textbf{additive Gaussian noise} ($\sigma=0.05$), \textbf{circular
+time shift} ($\pm40$ samples, the activity does not depend on where in the window
+it starts) and \textbf{time/Doppler masking} (SpecAugment-style, a zeroed band of
+$40$ time samples and $15$ velocity bins, forcing the encoder to use the whole
+time--velocity pattern).
 
 \subsubsection{Encoder and projection head}
 The encoder $f(\cdot)$ is a deeper, batch-normalized evolution of the baseline's
-Inception block. It keeps the three-branch front-end (max-pool / strided conv /
-deeper conv, concatenated to $41$ channels) and adds (i) batch normalization
-after every convolution, (ii) a $1\times1$ channel-mixing reduction to $32$
-channels, (iii) a second downsampling stage
-($32\!\rightarrow\!64\!\rightarrow\!128$, output $128\times43\times13$), and
+Inception block: the same three-branch front-end (concatenated to $41$ channels)
+plus (i) batch normalization after every convolution, (ii) a $1\times1$ reduction
+to $32$ channels, (iii) a second downsampling stage
+($32\!\rightarrow\!64\!\rightarrow\!128$, output $128\times43\times13$) and
 (iv) \emph{global average pooling}, which replaces the baseline's large
-\texttt{flatten}$\rightarrow$dense layer with a fixed $128$-dimensional
-representation $h$ that has fewer parameters and is more shift-robust. A small
-MLP \emph{projection head} $g(\cdot)$ ($128\!\rightarrow\!128\!\rightarrow\!128$,
-ReLU) maps $h$ to an $L_2$-normalized embedding $\bm{z}=g(h)$ on the unit
-hypersphere; as prescribed by SupCon, the loss is applied to $\bm{z}$ and the
-head is \emph{discarded} after pre-training, so classification uses $h$. The
-whole model has $130{,}952$ parameters, comparable to the baseline's $128.5$k.
+\texttt{flatten}$\rightarrow$dense layer with a fixed $128$-d representation $h$
+that has fewer parameters and is more shift-robust. An MLP \emph{projection head}
+$g(\cdot)$ ($128\!\rightarrow\!128\!\rightarrow\!128$, ReLU) maps $h$ to an
+$L_2$-normalized $\bm{z}=g(h)$; as prescribed by SupCon the loss is applied to
+$\bm{z}$ and the head is \emph{discarded} afterwards, so classification uses $h$.
+The whole model has $130{,}952$ parameters against the baseline's $128.5$k.
 
 \subsubsection{SupCon loss}
 For a batch of $L_2$-normalized embeddings with labels, each anchor $i$ attracts
@@ -354,26 +261,24 @@ others, through a temperature-scaled softmax over cosine similarities:
 \log\frac{\exp(\bm{z}_i\!\cdot\!\bm{z}_p/\tau)}
 {\sum_{a\neq i}\exp(\bm{z}_i\!\cdot\!\bm{z}_a/\tau)},
 \end{equation}
-where $I$ is the set of anchors with at least one same-class positive (the
-implementation averages the per-anchor terms over the batch) and the temperature
-is $\tau=0.07$. Unlike self-supervised SimCLR~\cite{simclr}, using the labels in
-\eq{eq:supcon} makes \emph{all} same-activity windows in the batch positives---even
-those from different files or environments---which turns generic contrastive
-learning into an environment-invariant \emph{activity} representation.
+where $I$ is the set of anchors with at least one same-class positive and
+$\tau=0.07$. Unlike self-supervised SimCLR~\cite{simclr}, using the labels makes
+\emph{all} same-activity windows in the batch positives---even those from
+different files or environments---which turns generic contrastive learning into
+an environment-invariant \emph{activity} representation.
 
 \subsubsection{Training and evaluation protocol}
 Everything uses the \emph{same} $S1$-based split as the baseline. In
-\textbf{pre-training}, each batch is expanded into two augmented views and
-encoder and head are trained jointly with Adam (lr~$10^{-3}$, weight
-decay~$10^{-4}$) for up to $30$ epochs with early stopping (patience~$7$) on the
-validation contrastive loss. The \textbf{linear probe} then freezes the encoder,
-pre-computes and standardizes the embeddings, and trains a single
-$\mathrm{Linear}(128,5)$ layer with cross-entropy---isolating the quality of the
-representation---while \textbf{optional fine-tuning} unfreezes the encoder and
-trains end-to-end at lr~$10^{-4}$. A t-SNE projection of the test embeddings,
-colored by activity and by environment, serves as the invariance diagnostic. A
-variant that lowered the contrastive and probe rates to $10^{-4}$ alongside the
-baseline's was interrupted during pre-training and is not reported.
+\textbf{pre-training} each batch is expanded into two augmented views and encoder
+and head are trained jointly with Adam (weight decay~$10^{-4}$) for up to $30$
+epochs with early stopping on the validation contrastive loss. The \textbf{linear
+probe} then freezes the encoder, pre-computes and standardizes the embeddings and
+trains a single $\mathrm{Linear}(128,5)$ layer with cross-entropy---isolating the
+quality of the representation---while \textbf{optional fine-tuning} unfreezes
+everything at lr~$10^{-4}$. A t-SNE projection of the test embeddings, colored by
+activity and by environment, is the invariance diagnostic. The contrastive and
+probe learning rates were $10^{-3}$ on the non-overlapping data and $10^{-4}$ on
+the sliding-window data, a difference we return to in \secref{sec:results}.
 
 \subsection{Multi-antenna decision fusion}
 \label{sec:fusion}
@@ -390,12 +295,11 @@ probabilities of window~$i$; the fused decision is
 i.e.\ a \emph{soft} vote, preferred to majority voting on the hard labels because
 a confident antenna can outweigh two unsure ones and because it degrades
 gracefully when a recording provides fewer than four streams. The reference paper
-does not detail its own rule, so \eq{eq:fusion} is a standard instantiation of
-the idea rather than a byte-for-byte reproduction.
+does not detail its own rule, so \eq{eq:fusion} is a standard instantiation
+rather than a byte-for-byte reproduction.
 
 Two details make it correct: the group id must \emph{not} encode the stream
-index, so the four antennas collide onto one key; and the evaluation
+index, so the four antennas collide onto one key, and the evaluation
 \texttt{DataLoader} must not shuffle, or the probabilities stop lining up with
-the stored ids and the average silently mixes unrelated windows. Fusion also
-changes the \emph{unit} of evaluation: $2577$ physical time windows instead of
-$10{,}308$ antenna-level ones.
+the stored ids. Fusion also changes the \emph{unit} of evaluation: one decision
+per physical time window instead of one per antenna.

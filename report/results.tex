@@ -5,8 +5,8 @@
 
 All numbers come from the stored notebook outputs, one run per configuration,
 under the same protocol: train on $S1$, test on the unseen $S2$--$S7$.
-\tab{tab:compare} collects them per set, \fig{fig:perset} plots the four
-milestones, and \tab{tab:versions} maps each column to the change behind it.
+\tab{tab:compare} collects them per set and \fig{fig:perset} plots the four
+milestones.
 
 \begin{table*}[t]
   \centering
@@ -52,11 +52,11 @@ heavily confused ($0.39$ and $0.28$).
 \subsection{Contrastive representation}
 The linear probe on the frozen SupCon encoder raises accuracy to
 $\mathbf{53.1\%}$ (validation $58.3\%$): $+4.9$ points and an improvement on
-\emph{every} set, the largest on $S3$ ($+8.3$, unseen person) and $S7$ ($+5.9$,
-all new). Its confusion matrix (\fig{fig:cm}\,(b)) sharpens \emph{running} and
-softens $L\!\rightarrow\!E$ ($0.76\!\rightarrow\!0.52$). \emph{End-to-end
-fine-tuning} then \emph{hurts}, dropping to $48.4\%$: freezing the pre-trained
-encoder is what generalizes, fine-tuning re-overfits the one environment.
+\emph{every} set, the largest on $S3$ ($+8.3$, unseen person) and $S7$ ($+5.9$).
+Its confusion matrix (\fig{fig:cm}\,(b)) sharpens \emph{running} and softens
+$L\!\rightarrow\!E$ ($0.76\!\rightarrow\!0.52$). \emph{Fine-tuning} then
+\emph{hurts}, dropping to $48.4\%$: freezing the encoder is what generalizes,
+fine-tuning re-overfits the one environment.
 
 The t-SNE projection (\fig{fig:tsne}, from the sliding-window run of
 \secref{sec:sliding}) is the most informative diagnostic. Colored by
@@ -90,51 +90,46 @@ $\approx\!4.3$: the pre-training never fully converged.
     \caption{$+$ $4$-antenna fusion}
   \end{subfigure}
   \caption{Row-normalized confusion matrices on all unseen test environments,
-  along the four milestones of \fig{fig:perset}. The contrastive representation
-  (b) softens the $L\!\rightarrow\!E$ confusion of the baseline (a); the sliding
-  window (c) lifts every class; fusion (d) then repairs the low-motion pair
-  itself, $L$ going from $0.50$ to $0.75$ correct with the \emph{same} weights.}
+  along the four milestones. The contrastive representation (b) softens the
+  $L\!\rightarrow\!E$ confusion of the baseline (a); the sliding window (c) lifts
+  every class; fusion (d) repairs the low-motion pair itself, $L$ going from
+  $0.50$ to $0.75$ with the \emph{same} weights.}
   \label{fig:cm}
 \end{figure*}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\columnwidth]{tsne_slide.png}
-  \caption{t-SNE of the test embeddings of the SupCon encoder (sliding-window
-  run). \emph{Left},
-  colored by activity: a static region (\emph{empty}, \emph{sitting}) and a
+  \includegraphics[width=0.93\columnwidth]{tsne_slide.png}
+  \caption{t-SNE of the SupCon test embeddings (sliding-window run).
+  \emph{Left}, by activity: a static region (\emph{empty}, \emph{sitting}) and a
   moving arc (\emph{jumping}, \emph{running}, \emph{walking}). \emph{Right}, the
-  same points colored by environment: the colors are mixed \emph{inside} the
-  structure, i.e.\ the space is organized by \emph{activity}, not by
-  \emph{environment}.}
+  same points by environment: colors are mixed \emph{inside} the structure, i.e.\
+  the space is organized by \emph{activity}, not by \emph{environment}.}
   \label{fig:tsne}
 \end{figure}
 
 \subsection{Optimizer schedule}
-The slow schedule changes only the learning rate, the patience and the epoch
-budget, so the two runs isolate that factor. Slowing
-training down \emph{improves} cross-domain accuracy from $48.2\%$ to $51.3\%$
-($+3.1$ points, five sets out of six) even though the model fits its own training
-data \emph{worse} ($0.575$ vs.\ $0.601$, \fig{fig:curves}). With a single
-training environment the two objectives conflict: an epoch spent fitting $S1$
-better is also an epoch spent memorizing its room, person and day. It also
-tempers the previous subsection---$+3.1$ of the contrastive model's $+4.9$ points
-can be bought with an optimizer setting alone, so single-run gains of a few
-points here are fragile.
+The slow schedule changes only the learning rate, patience and budget, so the two
+runs isolate that factor. Slowing training down \emph{improves} accuracy from
+$48.2\%$ to $51.3\%$ ($+3.1$ points, five sets out of six) even though the model
+fits its own training data \emph{worse} ($0.575$ vs.\ $0.601$ training accuracy): with one training
+environment the two objectives conflict, as
+an epoch spent fitting $S1$ better is an epoch spent memorizing its room, person
+and day. It also tempers the previous result---$+3.1$ of the contrastive
+$+4.9$ points is buyable with an optimizer setting alone.
 
 \subsection{Sliding-window front-end}
 \label{sec:sliding}
 Cutting the same recordings at stride $30$ instead of $340$ turns $13{,}564$
 windows into $152{,}320$ and takes the \emph{unchanged} architecture from
 $48.2\%$ to $\mathbf{59.3\%}$ ($+11.1$ points, $+8.4$ to $+15.3$ per set). Two
-caveats keep this honest: the run also raises the early-stopping patience from
-$7$ to $12$, so part of the gain belongs to the longer schedule, and the extra
-windows are strongly correlated, so the effective sample size grows far less than
-tenfold. The cost is real---$\approx\!21$\,GB resident and an epoch an order of
-magnitude slower, exactly why the loader had to allocate once instead of
-concatenating---but \fig{fig:curves}(c) shows the denser windows buy genuine
-fitting capacity, not only noise: training accuracy reaches $0.756$ with
-validation accuracy $12$ points above the non-overlapping run.
+caveats: the run also raises patience from $7$ to $12$, so part of the gain
+belongs to the longer schedule, and the extra windows are correlated, so the
+effective sample size grows far less than tenfold. The cost is
+$\approx\!21$\,GB resident and an epoch an order of magnitude slower---exactly why
+the loader had to allocate once instead of concatenating---but the denser windows
+buy real fitting capacity, not noise: $0.756$ training accuracy with validation
+$12$ points above the non-overlapping run.
 
 \subsection{Multi-antenna decision fusion}
 Averaging the four per-antenna probability vectors (\eq{eq:fusion}) is the
@@ -142,17 +137,17 @@ largest single improvement we measured, and it is free: no retraining, no extra
 parameters, one softmax and one group-average at inference. On the
 sliding-window model it lifts $59.3\%$ to $\mathbf{72.1\%}$ ($+12.8$ points, from
 $+6.9$ on $S7$ to $+17.1$ on $S2$); on the non-overlapping model it gave $+10.2$
-($51.3\!\rightarrow\!61.5\%$). The gain is therefore robust to the data regime.
+($51.3\!\rightarrow\!61.5\%$)---robust to the data regime.
 
-Its mechanism changes with that regime. At stride $340$ fusion sharpened the
+Its mechanism changes with the regime. At stride $340$ fusion sharpened the
 motion classes but left \emph{sitting}$\rightarrow$\emph{empty} untouched: with
-almost no motion in a window the four antennas agreed on the same wrong answer.
-At stride $30$ the single-antenna model is already half-right on that pair
+almost no motion the four antennas agreed on the same wrong answer. At stride
+$30$ the single-antenna model is already half-right on that pair
 (\fig{fig:cm}\,(c), $L$ at $0.50$) and fusion turns it into the largest per-class
 gain---$L$ reaches $0.75$, $L\!\rightarrow\!E$ falls from $0.45$ to $0.23$---next
 to \emph{jumping} ($0.56\!\rightarrow\!0.72$) and \emph{running}
-($0.63\!\rightarrow\!0.75$). Averaging only helps where the antennas disagree,
-and denser coverage is what creates that disagreement on low-motion windows.
+($0.63\!\rightarrow\!0.75$). Averaging helps only where antennas disagree, and
+denser coverage is what creates that disagreement on low-motion windows.
 
 \begin{figure}[t]
   \centering
@@ -165,58 +160,51 @@ and denser coverage is what creates that disagreement on low-motion windows.
 
 \subsection{Does contrastive learning still help?}
 Repeating the contrastive stage on the sliding-window data answers a question the
-first experiment could not: the linear probe now reaches $58.3\%$, $1.0$ point
+first experiment could not: the probe now reaches $58.3\%$, $1.0$ point
 \emph{below} the plain baseline it had beaten by $4.9$, and fine-tuning again
-does worse ($57.0\%$). The contrastive stage thus behaves as a
-\emph{data-efficiency} mechanism more than a domain-invariance one: with $2767$
-training windows it buys a representation cross-entropy cannot learn, with
-$31{,}103$ (correlated) windows cross-entropy catches up by itself. One confound:
-the contrastive and probe learning rates were left at $10^{-4}$ in that run while
-the baseline used $10^{-3}$, so part of the deficit may be an under-trained
-encoder rather than the data regime.
+does worse ($57.0\%$). The stage thus behaves as a \emph{data-efficiency}
+mechanism more than a domain-invariance one: with $2767$ training windows it buys
+a representation cross-entropy cannot learn; with $31{,}103$ correlated windows
+cross-entropy catches up alone. One confound: its learning rate was left at
+$10^{-4}$ there while the baseline used $10^{-3}$, so part of the deficit may be
+an under-trained encoder rather than the data regime.
 
 \subsection{Comparison with the SHARP paper}
-\tab{tab:compare} places our results next to the SHARP paper~\cite{sharp}: the
-\emph{full} system (strongest-path sanitization $+$ 4-antenna fusion) and an
-\emph{ablation} that swaps the sanitization for the standard reference-antenna
-method, feeding the \emph{same} CNN (\cite{sharp}, Table~4). Full SHARP stays
-above $95\%$ everywhere. Our best configuration (sliding window $+$ fusion,
-$72.1\%$) beats the ablation on \emph{every} unseen set, by $10.6$ ($S7$) to
-$26.8$ points ($S5$), with the largest margins exactly where the ablation
-collapses---the blocked-line-of-sight sets $S4$ and $S5$. The residual
+\tab{tab:compare} places our results next to SHARP~\cite{sharp}: the \emph{full}
+system (strongest-path sanitization $+$ 4-antenna fusion) and an \emph{ablation}
+that swaps the sanitization for the standard reference-antenna method, feeding
+the \emph{same} CNN (\cite{sharp}, Table~4). Full SHARP stays above $95\%$
+everywhere. Our best configuration ($72.1\%$) beats the ablation on \emph{every}
+unseen set, by $10.6$ ($S7$) to $26.8$ points ($S5$), with the largest margins
+exactly where it collapses---the blocked-line-of-sight sets. The residual
 $\sim\!26$-point gap to full SHARP is thus concentrated in the one ingredient we
-do not implement. The acquisition campaigns behind the dataset also spanned
-nearly two years (\cite{sharp}, Sec.~5.2), and that time diversity is part of
-what the reference results build on.
+do not implement.
 
 \subsection{Discussion}
 \label{sec:discussion}
 
 \paragraph{What each change bought}
 Ranked by measured effect, decision fusion ($+12.8$) and the sliding window
-($+11.1$) dominate the contrastive representation ($+4.9$, and $-1.0$ once data
-is plentiful) and the optimizer schedule ($+3.1$). The ordering is a finding in
-itself: the two cheapest changes---a stride constant and a few lines of
-post-processing over information already in the dataset---beat the one that cost
-the most design effort, and they compose, taking the \emph{same}
-$128{,}535$-parameter network from $48.2\%$ to $72.1\%$.
+($+11.1$) dominate the contrastive representation ($+4.9$, $-1.0$ once data is
+plentiful) and the optimizer schedule ($+3.1$). That ordering is a finding: the
+two cheapest changes---a stride constant and a few lines of post-processing---beat
+the one that cost the most design effort, and they compose, taking the
+\emph{same} network from $48.2\%$ to $72.1\%$.
 
 \paragraph{Why we are still far from SHARP}
-The gap is now essentially one component. SHARP uses the \emph{strongest}
-multipath component as phase reference, and its ablation shows the standard
+The gap is essentially one component. SHARP uses the \emph{strongest} multipath
+component as phase reference, and its ablation shows the standard
 reference-antenna method makes the \emph{same} CNN collapse to $39$--$60\%$
 (\tab{tab:compare}, last column). Our best model sits $10$ to $27$ points
 \emph{above} that ablation: we reproduced the decision-level half of SHARP's
-robustness and improved on the data side, but none of its signal-processing half.
+robustness and improved the data side, but none of its signal-processing half.
 Training on one small environment also makes every number high-variance.
 
 \paragraph{Where representation learning fits}
 The SupCon stage attacks domain shift on the \emph{representation} axis and, as
-the t-SNE shows, succeeds there---but its measured advantage evaporates once the
-front-end supplies ten times more windows. Contrastive pre-training is therefore
-worth its complexity when labelled windows are scarce, the realistic setting for
-a deployment with one calibration environment, while in the data-rich regime the
-effort is better spent on the front-end and the decision rule. The experiment
-left undone is fusion on top of the frozen probe with the contrastive stage
-re-tuned at $10^{-3}$: every component exists in the released code, but no run
-combines them.
+the t-SNE shows, succeeds---but its advantage evaporates once the front-end
+supplies ten times more windows. It is therefore worth its complexity when
+labelled windows are scarce, the realistic setting for a deployment with one
+calibration environment; in the data-rich regime the effort is better spent on
+the front-end and the decision rule. Left undone: fusion on top of the frozen
+probe with the contrastive stage re-tuned at $10^{-3}$.
