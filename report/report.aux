@@ -3,20 +3,22 @@
 \citation{sharp}
 \citation{sharp}
 \citation{supcon}
+\citation{sharp}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
 \newlabel{sec:introduction}{{I}{1}{}{}{}}
-\citation{sharp}
 \citation{sharp}
 \citation{csidataset}
 \citation{simclr}
 \citation{supcon}
 \citation{sharp}
 \citation{csidataset}
-\citation{sharp}
 \@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}{}\protected@file@percent }
 \newlabel{sec:related_work}{{II}{2}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {III}Processing Pipeline}{2}{}\protected@file@percent }
 \newlabel{sec:processing_architecture}{{III}{2}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The modifications evaluated, the code each required, and their effect on cross-domain accuracy (train on $S1$, test on $S2$--$S7$, one run each). Each is measured against the reference configuration of the first row, or against the same configuration with a sliding front-end.}}{2}{}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:versions}{{1}{2}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}The changes we evaluate}{2}{}\protected@file@percent }
 \newlabel{sec:versions}{{\mbox  {III-A}}{2}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Signals and Features}{2}{}\protected@file@percent }
@@ -25,26 +27,24 @@
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The modifications evaluated, the code each required, and their effect on cross-domain accuracy (train on $S1$, test on $S2$--$S7$, one run each). Each is measured against the reference configuration of the first row, or against the same configuration with a sliding front-end.}}{3}{}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{tab:versions}{{1}{3}{}{}{}}
+\citation{sharp}
+\citation{supcon}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}From traces to windows}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Baseline single-antenna architecture, a faithful reproduction of the SHARP reduced-Inception module~(\cite  {sharp}, Fig.~4). \texttt  {S2} denotes stride~2; every CONV is followed by a ReLU ($128{,}535$ parameters).}}{3}{}\protected@file@percent }
-\newlabel{fig:baseline_arch}{{1}{3}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Cross-domain split}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Baseline single-antenna architecture of SHARP reduced-Inception module~(\cite  {sharp}, Fig.~4). \texttt  {S2} denotes stride~2; every CONV is followed by a ReLU ($128{,}535$ parameters).}}{3}{}\protected@file@percent }
+\newlabel{fig:baseline_arch}{{1}{3}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {V}Learning Framework}{3}{}\protected@file@percent }
 \newlabel{sec:learning_framework}{{V}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Baseline CNN (M.~Carraro)}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Baseline CNN}{3}{}\protected@file@percent }
 \newlabel{sec:baseline}{{\mbox  {V-A}}{3}{}{}{}}
-\citation{supcon}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Contrastive extension: Supervised Contrastive Learning}{3}{}\protected@file@percent }
+\newlabel{sec:contrastive}{{\mbox  {V-B}}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}1}Motivation and augmentations}{3}{}\protected@file@percent }
 \citation{simclr}
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Contrastive extension: Supervised Contrastive Learning (F.~Vezzani)}{4}{}\protected@file@percent }
-\newlabel{sec:contrastive}{{\mbox  {V-B}}{4}{}{}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}1}Motivation and augmentations}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}2}Encoder and projection head}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}3}SupCon loss}{4}{}\protected@file@percent }
 \newlabel{eq:supcon}{{1}{4}{}{}{}}
@@ -56,38 +56,38 @@
 \newlabel{sec:results}{{VI}{4}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Baseline}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Contrastive representation}{4}{}\protected@file@percent }
-\citation{sharp}
-\citation{sharp}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Optimizer schedule}{4}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Per-set accuracy (\%), training on $S1$ and testing on the unseen sets, one run per column. Non-overlapping windows: baseline under the fast ($10^{-3}$) and slow ($10^{-4}$) schedules, SupCon linear probe, and fusion on the slow-schedule model. Sliding window (stride $30$): baseline, SupCon probe and fusion. Fusion always re-uses the weights of the baseline to its left. SHARP columns from~\cite  {sharp} (Tables~3 and~4).}}{5}{}\protected@file@percent }
 \newlabel{tab:compare}{{2}{5}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Optimizer schedule}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Row-normalized confusion matrices on all unseen test environments, along the four milestones. The contrastive representation (b) softens the $L\!\rightarrow \!E$ confusion of the baseline (a); the sliding window (c) lifts every class; fusion (d) repairs the low-motion pair itself, $L$ going from $0.49$ to $0.71$ with the same weights.}}{5}{}\protected@file@percent }
+\newlabel{fig:cm}{{2}{5}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces t-SNE of the SupCon test embeddings (sliding-window run). Left, by activity: a static region (empty, sitting) and a moving arc (jumping, running, walking). Right, the same points by environment: colors are mixed inside the structure, i.e.\ the space is organized by activity, not by environment.}}{5}{}\protected@file@percent }
+\newlabel{fig:tsne}{{3}{5}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Sliding-window front-end}{5}{}\protected@file@percent }
 \newlabel{sec:sliding}{{\mbox  {VI-D}}{5}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Multi-antenna decision fusion}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Train/validation loss and accuracy for the adopted sliding-window schedule (stride $30$, patience $12$): early stopping restores the epoch-$15$ weights (lowest validation loss) even though training accuracy keeps climbing through epoch $27$.}}{5}{}\protected@file@percent }
+\newlabel{fig:training_curves}{{4}{5}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-F}}Does contrastive learning still help?}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-G}}Comparison with the SHARP paper}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-H}}Discussion}{5}{}\protected@file@percent }
-\newlabel{sec:discussion}{{\mbox  {VI-H}}{5}{}{}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-H}0a}What each change bought}{5}{}\protected@file@percent }
+\citation{sharp}
+\citation{sharp}
 \citation{sharp}
 \bibdata{biblio}
 \bibcite{sharp}{1}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Row-normalized confusion matrices on all unseen test environments, along the four milestones. The contrastive representation (b) softens the $L\!\rightarrow \!E$ confusion of the baseline (a); the sliding window (c) lifts every class; fusion (d) repairs the low-motion pair itself, $L$ going from $0.49$ to $0.71$ with the \emph  {same} weights.}}{6}{}\protected@file@percent }
-\newlabel{fig:cm}{{2}{6}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces t-SNE of the SupCon test embeddings (sliding-window run). \emph  {Left}, by activity: a static region (\emph  {empty}, \emph  {sitting}) and a moving arc (\emph  {jumping}, \emph  {running}, \emph  {walking}). \emph  {Right}, the same points by environment: colors are mixed \emph  {inside} the structure, i.e.\ the space is organized by \emph  {activity}, not by \emph  {environment}.}}{6}{}\protected@file@percent }
-\newlabel{fig:tsne}{{3}{6}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Train/validation loss and accuracy for the adopted sliding-window schedule (stride $30$, patience $12$): early stopping restores the epoch-$15$ weights (lowest validation loss) even though training accuracy keeps climbing through epoch $27$.}}{6}{}\protected@file@percent }
-\newlabel{fig:training_curves}{{4}{6}{}{}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-H}0b}Why we are still far from SHARP}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-H}0c}Where representation learning fits}{6}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Cross-domain accuracy per measurement set along the four milestones (dashed line: the $20\%$ chance level). Every unseen set benefits from the sliding window and, on top of it, from antenna fusion.}}{6}{}\protected@file@percent }
-\newlabel{fig:perset}{{5}{6}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Concluding Remarks}{6}{}\protected@file@percent }
-\newlabel{sec:conclusions}{{VII}{6}{}{}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VII-}0a}What we learned and difficulties encountered}{6}{}\protected@file@percent }
 \bibcite{csidataset}{2}
 \bibcite{supcon}{3}
 \bibcite{simclr}{4}
 \bibstyle{ieeetr}
-\@writefile{toc}{\contentsline {section}{References}{7}{}\protected@file@percent }
-\gdef \@abspage@last{7}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Cross-domain accuracy per measurement set along the four milestones (dashed line: the $20\%$ chance level). Every unseen set benefits from the sliding window and, on top of it, from antenna fusion.}}{6}{}\protected@file@percent }
+\newlabel{fig:perset}{{5}{6}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-G}}Comparison with the SHARP paper}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-H}}Discussion}{6}{}\protected@file@percent }
+\newlabel{sec:discussion}{{\mbox  {VI-H}}{6}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-H}0a}What each change bought}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-H}0b}Why we are still far from SHARP}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-H}0c}Where representation learning fits}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Concluding Remarks}{6}{}\protected@file@percent }
+\newlabel{sec:conclusions}{{VII}{6}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VII-}0a}What we learned and difficulties encountered}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
+\gdef \@abspage@last{6}

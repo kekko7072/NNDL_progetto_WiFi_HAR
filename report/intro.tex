@@ -6,28 +6,28 @@
 Contactless sensing of human activity is valuable in healthcare, security and
 ambient monitoring. Commodity Wi-Fi devices can be repurposed as radar-like
 sensors: as a person moves, their body induces micro-Doppler shifts captured in
-the channel-state information (CSI) estimated by the receiver, \emph{without
-recording any video}. After processing, the CSI becomes a \emph{Doppler
-spectrogram}---a time$\,\times\,$velocity image---whose appearance changes
+the channel-state information (CSI) estimated by the receiver, without
+recording any video. After processing, the CSI becomes a Doppler
+spectrogram, a time$\,\times\,$velocity image, whose appearance changes
 markedly with the activity, so recognition can be cast as image classification
 with a convolutional neural network (CNN)~\cite{sharp}.
 
-The central difficulty is \emph{generalization}. Different people move
-differently, and different rooms---even the same room on different days---distort
-the signal differently, so a model that classifies perfectly in its training
+The central difficulty is generalization. Different people move
+differently, and different rooms, even the same room on different days, distort
+the signal differently. So a model that classifies perfectly in its training
 environment may collapse on a new one. The project proposal raises exactly this
-challenge and suggests a \emph{contrastive / self-supervised} approach to obtain
+challenge and suggests a contrastive / self-supervised approach to obtain
 subject- and environment-independent features. Prior systems close the gap mostly
-through signal processing---robust phase sanitization and multi-antenna
-fusion---at the cost of a heavy, hand-engineered pipeline~\cite{sharp}.
+through signal processing, robust phase sanitization and multi-antenna
+fusion, at the cost of a heavy, hand-engineered pipeline~\cite{sharp}.
 
 We tackle five-class Wi-Fi HAR under a strict cross-domain protocol (train on
 one environment, test on six unseen ones) and ask how much of the gap can be
-closed \emph{without} that front-end: by \emph{learning} invariance with
+closed without that front-end: by learning invariance with
 Supervised Contrastive Learning (SupCon)~\cite{supcon} instead of engineering it,
 by re-using the receiver diversity the dataset already provides, and by feeding
 the network more of the signal it already has. Every change is implemented and
-measured \emph{one at a time}, on the same baseline and protocol, so each
+measured one at a time, on the same baseline and protocol, so each
 accuracy figure is attributable to one design decision (\tab{tab:versions}). The
 contributions are:
 \begin{itemize}
@@ -40,16 +40,15 @@ contributions are:
   improves every set when training data is scarce, and stops helping once it is
   not.
   \item \textbf{Multi-antenna decision fusion.} A group identifier threaded
-  through the pipeline recovers which windows are the \emph{same} physical time
+  through the pipeline recovers which windows are the same physical time
   window seen by the four antennas, so their predictions can be fused by
-  averaging class probabilities: $+10$ to $+13$ points in both data regimes, with
-  no retraining.
+  averaging class probabilities.
   \item \textbf{Front-end and optimization engineering.} A sliding window at the
   stride used by the SHARP authors ($30$ samples, $91\%$ overlap) replaces the
-  na\"ive segmentation---$+11.9$ points on its own, affordable only through a
-  two-pass, memory-bounded dataset builder; a controlled comparison of optimizer
+  na\"ive segmentation, affordable only through a two-pass, memory-bounded 
+  dataset builder; a controlled comparison of optimizer
   schedules shows that, with a single training environment, fitting the training
-  set better does \emph{not} imply generalizing better.
+  set better does not imply generalizing better.
 \end{itemize}
 Combining the last two takes the same architecture from $48.2\%$ to
 $\mathbf{72.7\%}$. We use the full SHARP system~\cite{sharp} as the reference

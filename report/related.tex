@@ -7,20 +7,20 @@
 Device-free HAR from commodity Wi-Fi has matured rapidly thanks to CSI extraction
 tools and public datasets. The most relevant work for us is SHARP~\cite{sharp},
 which recognizes activities from the Doppler information in IEEE~802.11ac CSI and
-targets \emph{environment and person independence} through two ingredients: (i) a robust phase-sanitization step that isolates the
-multipath components and adopts the \emph{strongest path} as phase reference, and
-(ii) a \emph{decision-fusion} scheme that runs a compact Inception-style CNN on
+targets environment and person independence through two ingredients: (i) a robust phase-sanitization step that isolates the
+multipath components and adopts the strongest path as phase reference, and
+(ii) a decision-fusion scheme that runs a compact Inception-style CNN on
 each of the four receiver antennas and combines their decisions. On the seven
 measurement sets of the accompanying dataset~\cite{csidataset} the full system
 exceeds $95\%$ even on rooms, days and persons never seen at training time. Those
 results rest on a heavy, hand-engineered front-end: the paper's own ablation
 shows that replacing the strongest-path sanitization with the standard
-reference-antenna method makes the \emph{same} CNN collapse to $39$--$60\%$ on
+reference-antenna method makes the same CNN collapse to $39$--$60\%$ on
 the unseen sets, i.e.\ much of the robustness is carried by the pre-processing
 rather than the learned representation. Our work keeps the minimal front-end
 and asks how much cross-domain robustness can be recovered elsewhere: on the
-\emph{representation} side (contrastive pre-training) and on the
-\emph{decision} side, by re-implementing SHARP's antenna fusion---which,
+representation side (contrastive pre-training) and on the
+decision side, by re-implementing SHARP's antenna fusion, which,
 unlike sanitization, costs nothing at training time and turns out to be worth
 more than any other change we made.
 
@@ -31,11 +31,11 @@ SimCLR~\cite{simclr} established the self-supervised recipe of contrasting two
 augmented views against in-batch negatives with a temperature-scaled InfoNCE
 loss on $L_2$-normalized embeddings. Supervised Contrastive Learning
 (SupCon)~\cite{supcon} extends it to
-the labelled setting---\emph{all} samples sharing the anchor's label become
-positives---producing tighter, more class-consistent clusters than cross-entropy.
+the labelled setting (all samples sharing the anchor's label become
+positives) producing tighter, more class-consistent clusters than cross-entropy.
 We adopt SupCon because its notion of ``positive'' maps onto our goal: two
-windows of the same activity should be neighbours \emph{whatever environment,
-person or antenna they come from}. Combining it with explicit
+windows of the same activity should be neighbours whatever environment,
+person or antenna they come from. Combining it with explicit
 domain-randomization augmentations for cross-domain Wi-Fi HAR on the SHARP data
 is the extension we contribute, and \secref{sec:results} quantifies both its
 gains and the regime in which they vanish.

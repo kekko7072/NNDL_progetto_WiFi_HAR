@@ -64,11 +64,10 @@
 \title{Human Activity Recognition from Wi-Fi CSI Doppler Spectrograms:\\
 A CNN Baseline and a Contrastive Extension for Cross-Domain Generalization}
 
-\author{Marco Carraro$^\dag$ \quad Francesco Vezzani$^\dag$
+\author{\; \qquad Marco Carraro$^\dag$ \quad \; Francesco Vezzani$^\dag$
 \thanks{$^\dag$Department of Information Engineering, University of Padova, Italy, \newline
-email: \texttt{\{name.surname\}@studenti.unipd.it}}
-\thanks{Course project for Neural Networks and Deep Learning. Baseline pipeline
-by M.~Carraro; Supervised Contrastive Learning extension by F.~Vezzani.}
+email: \texttt{marco.carraro.23@studenti.unipd.it}, [Mat. 2159568]\newline
+email: \texttt{francesco.vezzani.1@studenti.unipd.it}, [Mat. 2159567]}
 }
 
 \maketitle
@@ -78,29 +77,23 @@ by M.~Carraro; Supervised Contrastive Learning extension by F.~Vezzani.}
 We study device-free human activity recognition (HAR) from the Doppler
 spectrograms of Wi-Fi channel-state information (CSI), using the publicly
 released traces of the SHARP dataset~\cite{sharp,csidataset}. Starting from the
-Inception-style convolutional baseline of the course material---trained
-\emph{only} on measurement set~$S1$ and evaluated on the six unseen sets
-$S2$--$S7$, where it reaches $48.2\%$---we add and measure, one change at a time,
-four strategies for closing the cross-domain gap without the hand-engineered
-front-end of the reference system. (i) \emph{Supervised contrastive
-pre-training}: a batch-normalized encoder trained with a SupCon objective and
-domain-randomization augmentations, with a linear probe on the frozen
-representation, gives $53.1\%$ and improves \emph{every} measurement set. (ii) \emph{A
-slower optimizer schedule} reaches $51.3\%$ while fitting the training environment
-\emph{worse}, showing that on a single-environment training set the two
-objectives conflict. (iii) \emph{An overlapping sliding window} at the stride used
-by the dataset authors ($30$ samples, $91\%$ overlap, $\approx\!10\times$ more
-windows), made affordable by a two-pass, memory-bounded loader, lifts the same
-baseline to $60.1\%$. (iv) \emph{Multi-antenna soft decision fusion}: a
-recording-level group identifier threaded through the data pipeline lets the four
-per-antenna probability vectors of one physical time window be averaged, adding
-$+12.6$ points with no retraining and no extra parameters. Together the last two
-reach $\mathbf{72.7\%}$ ($+24.5$ over the initial baseline) and beat the
-single-component ablation of the reference system on every unseen set. Notably,
-contrastive pre-training helps in the data-poor regime but not once the sliding
-window supplies ten times more windows. The residual gap to the full pipeline
-($>95\%$) is attributable to its strongest-path phase sanitization, which we do
-not implement.
+Inception-style convolutional baseline of the course material, trained
+only on measurement set~$S1$ and evaluated on the six unseen sets
+$S2$--$S7$. We add and measure, one change at a time, four strategies for
+closing the cross-domain gap without the hand-engineered front-end of the
+reference system: (i) supervised contrastive pre-training, with a linear probe
+on the frozen representation; (ii) a slower optimizer schedule; (iii) an
+overlapping sliding window at the stride used by the dataset authors, made
+affordable by a two-pass, memory-bounded loader; and (iv) multi-antenna soft
+decision fusion, averaging the per-antenna probability vectors of each
+physical time window with no retraining and no extra parameters. The last two
+compose into our best configuration, taking the same network from
+$48.2\%$ to $\mathbf{72.7\%}$ and beating the single-component ablation of the
+reference system on every unseen set. Contrastive pre-training helps in the
+data-poor regime but stops helping once the sliding window supplies
+substantially more training windows. The residual gap to the full reference
+pipeline is attributable to its strongest-path phase sanitization, which we
+do not implement.
 \end{abstract}
 
 \input{intro}
