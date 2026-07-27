@@ -293,15 +293,14 @@ accuracy and stops at epoch~$27$.
 \subsubsection{Motivation}
 The baseline is trained with plain cross-entropy on a single environment, so
 nothing pushes its features to be invariant across domains. Following the
-\emph{contrastive / self-supervised} direction suggested in the project
-proposal, we implement \emph{Supervised Contrastive Learning}
-(SupCon)~\cite{supcon}. The key change is \emph{what} is optimized: instead of
-predicting the label directly, an \emph{encoder} is trained so that two windows
-of the \emph{same activity} are pulled together and windows of different
-activities are pushed apart---\emph{regardless of the environment, person or
-antenna they come from}. Because the objective depends only on activity identity,
-the encoder is driven to discard environment-specific nuisances; a tiny linear
-classifier is then fit on the frozen representation (\emph{linear probe}).
+\emph{contrastive / self-supervised} direction suggested in the project proposal,
+we implement \emph{Supervised Contrastive Learning} (SupCon)~\cite{supcon}: an
+\emph{encoder} is trained so that two windows of the \emph{same activity} are
+pulled together and windows of different activities pushed apart, \emph{whatever
+environment, person or antenna they come from}. Since the objective depends only
+on activity identity, the encoder is driven to discard environment-specific
+nuisances; a tiny linear classifier is then fit on the frozen representation
+(\emph{linear probe}).
 
 \subsubsection{Domain-randomization augmentations}
 SupCon needs, for each window, two augmented ``views'' that keep the activity
@@ -381,10 +380,9 @@ baseline's was interrupted during pre-training and is not reported.
 The dataset ships the four antenna streams \emph{separately}, and both chains so
 far discard that structure. SHARP keeps the per-antenna training convention but
 fuses the four decisions at inference~\cite{sharp}; that step is reproduced here
-as pure post-processing---classifier, weights and training procedure untouched.
-For a group id $g$, let $A_g$ be the (up to four) antenna windows carrying it and
-$\bm{p}_i=\mathrm{softmax}(f(\bm{x}_i))$ the class probabilities of window~$i$.
-The fused decision is
+as pure post-processing. For a group id $g$, let $A_g$ be the (up to four)
+antenna windows carrying it and $\bm{p}_i=\mathrm{softmax}(f(\bm{x}_i))$ the class
+probabilities of window~$i$; the fused decision is
 \begin{equation}
 \label{eq:fusion}
 \hat{y}_g=\argmax_{c\in\{1,\dots,5\}}\ \frac{1}{|A_g|}\sum_{i\in A_g} p_{i,c},
@@ -392,8 +390,8 @@ The fused decision is
 i.e.\ a \emph{soft} vote, preferred to majority voting on the hard labels because
 a confident antenna can outweigh two unsure ones and because it degrades
 gracefully when a recording provides fewer than four streams. The reference paper
-does not detail its own fusion rule, so \eq{eq:fusion} is a standard
-instantiation of the idea rather than a byte-for-byte reproduction.
+does not detail its own rule, so \eq{eq:fusion} is a standard instantiation of
+the idea rather than a byte-for-byte reproduction.
 
 Two details make it correct: the group id must \emph{not} encode the stream
 index, so the four antennas collide onto one key; and the evaluation

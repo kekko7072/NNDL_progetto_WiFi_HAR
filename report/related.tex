@@ -6,9 +6,8 @@
 \textbf{Wi-Fi sensing and the SHARP system.}
 Device-free HAR from commodity Wi-Fi has matured rapidly thanks to CSI extraction
 tools and public datasets. The most relevant work for us is SHARP~\cite{sharp},
-which recognizes activities from the Doppler information in the CSI of
-IEEE~802.11ac links and targets \emph{environment and person independence}
-through two ingredients: (i) a robust phase-sanitization step that isolates the
+which recognizes activities from the Doppler information in IEEE~802.11ac CSI and
+targets \emph{environment and person independence} through two ingredients: (i) a robust phase-sanitization step that isolates the
 multipath components and adopts the \emph{strongest path} as phase reference, and
 (ii) a \emph{decision-fusion} scheme that runs a compact Inception-style CNN on
 each of the four receiver antennas and combines their decisions. On the seven
@@ -35,9 +34,8 @@ embeddings. Supervised Contrastive Learning (SupCon)~\cite{supcon} extends it to
 the labelled setting---\emph{all} samples sharing the anchor's label become
 positives---producing tighter, more class-consistent clusters than cross-entropy.
 We adopt SupCon because its notion of ``positive'' maps onto our goal: two
-windows of the same activity should be neighbours \emph{regardless of the
-environment, person or antenna they come from}. Combining SupCon with explicit
+windows of the same activity should be neighbours \emph{whatever environment,
+person or antenna they come from}. Combining it with explicit
 domain-randomization augmentations for cross-domain Wi-Fi HAR on the SHARP data
-is the extension we contribute: it complements the signal-processing route
-of~\cite{sharp} by attacking domain shift from the feature-learning side, and we
-quantify its gains and its residual limits in \secref{sec:results}.
+is the extension we contribute, and \secref{sec:results} quantifies both its
+gains and the regime in which they vanish.

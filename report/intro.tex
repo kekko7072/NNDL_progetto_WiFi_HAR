@@ -13,29 +13,23 @@ markedly with the activity, so recognition can be cast as image classification
 with a convolutional neural network (CNN)~\cite{sharp}.
 
 The central difficulty is \emph{generalization}. Different people move
-differently, and different rooms (and even the same room on different days)
-distort the signal differently, so a model that classifies perfectly in its
-training environment may collapse on a new one. This is the challenge raised in
-the project proposal, which explicitly suggests a
-\emph{contrastive / self-supervised} approach to obtain subject- and
-environment-independent features. Prior systems close this gap mostly through
-signal processing---robust phase sanitization and multi-antenna fusion---at the
-cost of a heavy, hand-engineered pipeline~\cite{sharp}; we instead ask how far a
-purely \emph{representation-learning} remedy can go on top of a minimal
-front-end.
+differently, and different rooms---even the same room on different days---distort
+the signal differently, so a model that classifies perfectly in its training
+environment may collapse on a new one. The project proposal raises exactly this
+challenge and suggests a \emph{contrastive / self-supervised} approach to obtain
+subject- and environment-independent features. Prior systems close the gap mostly
+through signal processing---robust phase sanitization and multi-antenna
+fusion---at the cost of a heavy, hand-engineered pipeline~\cite{sharp}.
 
-In this report we tackle five-class Wi-Fi HAR under a strict cross-domain
-protocol (train on a single environment, test on six unseen ones) and ask how
-much of the domain gap can be closed \emph{without} the hand-engineered
-front-end: first by \emph{learning} invariance with Supervised Contrastive
-Learning (SupCon)~\cite{supcon} instead of engineering it, then by re-using the
-receiver diversity that the dataset already provides. Both remedies are
-data-efficient---they reuse the same small training set and a lightweight
-encoder---and both compose with the orthogonal signal-processing tools of the
-reference system. Every change is implemented and measured \emph{one at a time},
-on top of the same baseline and the same protocol, so that each accuracy figure
-is attributable to one design decision (\tab{tab:versions}). The contributions
-are:
+We tackle five-class Wi-Fi HAR under a strict cross-domain protocol (train on
+one environment, test on six unseen ones) and ask how much of the gap can be
+closed \emph{without} that front-end: by \emph{learning} invariance with
+Supervised Contrastive Learning (SupCon)~\cite{supcon} instead of engineering it,
+by re-using the receiver diversity the dataset already provides, and by feeding
+the network more of the signal it already has. Every change is implemented and
+measured \emph{one at a time}, on the same baseline and protocol, so each
+accuracy figure is attributable to one design decision (\tab{tab:versions}). The
+contributions are:
 \begin{itemize}
   \item \textbf{Baseline (M.~Carraro).} A faithful reimplementation, in plain
   PyTorch, of the dataset pipeline and of the baseline Inception-style CNN, with
