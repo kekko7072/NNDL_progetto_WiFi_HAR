@@ -1,0 +1,45 @@
+% !TEX root = report.tex
+
+\section{Related Work}
+\label{sec:related_work}
+
+\textbf{Wi-Fi sensing and the SHARP system.}
+Device-free HAR from commodity Wi-Fi has matured rapidly thanks to the
+availability of CSI extraction tools and public datasets. The most relevant work
+for us is SHARP~\cite{sharp}, which recognizes human activities from the Doppler
+information contained in the CSI of IEEE~802.11ac links and, crucially, targets
+\emph{environment and person independence}. SHARP achieves this through two
+ingredients: (i) a robust phase-sanitization step that isolates the multipath
+components and adopts the \emph{strongest path} as the phase reference, and (ii)
+a \emph{decision-fusion} scheme that runs a compact Inception-style CNN on each
+of the four receiver antennas and combines the per-antenna decisions. On the
+seven measurement sets of the accompanying CSI dataset~\cite{csidataset}, the
+full system exceeds $95\%$ accuracy even on rooms, days and persons never seen at
+training time. These results are excellent, but they rest on a heavy,
+hand-engineered signal-processing front-end; the paper's own ablation shows that
+replacing the strongest-path sanitization with the standard reference-antenna
+method makes the \emph{same} CNN collapse to $39$--$60\%$ on the unseen sets,
+revealing how much of the robustness is carried by the pre-processing rather than
+by the learned representation. Our work keeps the minimal front-end (single
+antenna, no strongest-path sanitization) and asks how much cross-domain
+robustness can instead be recovered on the \emph{representation} side.
+
+\textbf{Contrastive representation learning.}
+Contrastive methods learn representations by pulling together ``views'' that
+should be similar and pushing apart those that should differ. SimCLR~\cite{simclr}
+established a simple self-supervised recipe: two random augmentations of the same
+image form a positive pair, all other images in the batch are negatives, and an
+encoder is trained with a temperature-scaled InfoNCE loss on $L_2$-normalized
+embeddings. Supervised Contrastive Learning (SupCon)~\cite{supcon} extends this
+idea to the labelled setting: \emph{all} samples sharing the anchor's label
+become positives, which produces tighter, more class-consistent clusters than
+cross-entropy and improves robustness to natural corruptions. We adopt SupCon
+because its notion of ``positive'' maps naturally onto our goal: two windows of
+the same activity should be neighbours \emph{regardless of the environment,
+person or antenna they come from}, so that the encoder is driven to discard
+domain-specific nuisances. To the best of our knowledge, combining SupCon with
+explicit domain-randomization augmentations for cross-domain Wi-Fi HAR on the
+SHARP data is the specific extension we contribute here: it complements the
+signal-processing route of~\cite{sharp} by attacking domain shift from the
+feature-learning side, and we quantify both its gains and its residual limits in
+\secref{sec:results}.

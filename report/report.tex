@@ -1,0 +1,123 @@
+%=============================================================================
+% Neural Networks and Deep Learning -- Course Project
+% Human Activity Recognition from Wi-Fi CSI Doppler spectrograms
+%
+% Root file. Structured after the NNDL project report template:
+%   \input{intro} \input{related} \input{model} \input{results} \input{conclusions}
+%
+% Authors / contributions:
+%   * Marco Carraro     -- dataset pipeline + baseline CNN
+%   * Francesco Vezzani -- Supervised Contrastive Learning extension
+%
+% Compile with pdflatex + bibtex (IEEEtran.cls is bundled in this folder).
+%=============================================================================
+\documentclass[10pt, conference, letterpaper]{IEEEtran}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{cite}
+\usepackage{bm}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
+
+% IEEEtran defaults the typewriter face to Courier (pcr); use the always-available
+% Computer Modern typewriter instead so the report builds on any TeX install.
+\renewcommand{\ttdefault}{cmtt}
+
+\renewcommand{\thetable}{\arabic{table}}
+\renewcommand{\thesubtable}{\alph{subtable}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\graphicspath{{./figures/}}
+\setlength{\belowcaptionskip}{0mm}
+\setlength{\textfloatsep}{8pt}
+
+% ---- Cross-referencing helpers (as in the template) -------------------------
+\newcommand{\eq}[1]{Eq.~\eqref{#1}}
+\newcommand{\fig}[1]{Fig.~\ref{#1}}
+\newcommand{\tab}[1]{Tab.~\ref{#1}}
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\rev}[1]{{\color{blue}#1}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\mytexttilde}{{\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}}
+
+\setlength{\columnsep}{0.2in}
+\IEEEoverridecommandlockouts
+
+\begin{document}
+
+\title{Human Activity Recognition from Wi-Fi CSI Doppler Spectrograms:\\
+A CNN Baseline and a Contrastive Extension for Cross-Domain Generalization}
+
+\author{Marco Carraro$^\dag$ \quad Francesco Vezzani$^\dag$
+\thanks{$^\dag$Department of Information Engineering, University of Padova, Italy, \newline
+email: \texttt{\{name.surname\}@studenti.unipd.it}}
+\thanks{Course project for Neural Networks and Deep Learning. Baseline pipeline
+by M.~Carraro; Supervised Contrastive Learning extension by F.~Vezzani.}
+}
+
+\maketitle
+
+%=============================================================================
+\begin{abstract}
+We study device-free human activity recognition (HAR) from the Doppler
+spectrograms of Wi-Fi channel-state information (CSI), using the publicly
+released traces of the SHARP dataset~\cite{sharp,csidataset}. We first reproduce
+the Inception-style convolutional baseline of the course material (developed by
+M.~Carraro): trained \emph{only} on measurement set~$S1$ and evaluated on the
+six unseen sets $S2$--$S7$, it reaches $48.2\%$ accuracy on the unseen domains,
+quantifying how hard cross-domain generalization is when no domain-invariance
+mechanism is used. We then add a Supervised Contrastive Learning (SupCon)
+extension (developed by F.~Vezzani): a deeper, batch-normalized encoder is
+pre-trained with a supervised-contrastive objective and domain-randomization
+augmentations, and a linear probe is fit on the frozen representation. This
+raises accuracy to $53.1\%$, improving over the baseline on \emph{every}
+measurement set ($+4.9$ points overall), and a t-SNE analysis confirms the
+learned space is environment-invariant. Both models remain well below the full
+SHARP pipeline ($>95\%$ on every set), whose strongest-path phase sanitization
+and multi-antenna \emph{decision fusion} we do not implement; we analyse this
+gap and argue that the two ideas are complementary.
+\end{abstract}
+
+\IEEEkeywords
+Human Activity Recognition, Wi-Fi Sensing, Channel State Information,
+Convolutional Neural Networks, Contrastive Learning, Domain Generalization.
+\endIEEEkeywords
+
+\input{intro}
+
+\input{related}
+
+\input{model}
+
+\input{results}
+
+\input{conclusions}
+
+%=============================================================================
+\section*{Author Contributions}
+\textbf{Marco Carraro:} dataset/windowing pipeline, baseline Inception CNN,
+training with early stopping, and the cross-domain evaluation (\secref{sec:model}
+and the baseline parts of \secref{sec:learning_framework}--\ref{sec:results}).
+\textbf{Francesco Vezzani:} the Supervised Contrastive Learning extension
+(notebook~\S9)---augmentations, the batch-normalized encoder with global average
+pooling, the projection head and SupCon loss, contrastive pre-training,
+linear-probe / fine-tuning evaluation, and the t-SNE analysis (the contrastive
+parts of \secref{sec:learning_framework}--\ref{sec:results}).
+
+%=============================================================================
+\bibliography{biblio}
+\bibliographystyle{ieeetr}
+
+\end{document}

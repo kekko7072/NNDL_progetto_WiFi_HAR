@@ -1,0 +1,60 @@
+% !TEX root = report.tex
+
+\section{Introduction}
+\label{sec:introduction}
+
+Contactless sensing of human activity is valuable in healthcare, security and
+ambient monitoring. Commodity Wi-Fi devices can be repurposed as radar-like
+sensors: as a person moves, their body induces micro-Doppler shifts on the
+Wi-Fi signal that are captured in the channel-state information (CSI) estimated
+by the receiver, \emph{without recording any video}. After suitable processing,
+the CSI can be turned into a \emph{Doppler spectrogram}---a
+time$\,\times\,$velocity image---whose appearance changes markedly with the
+activity being performed, so the recognition problem can be cast as image
+classification with a convolutional neural network (CNN)~\cite{sharp}.
+
+The central difficulty is \emph{generalization}. Different people move
+differently, and different rooms (and even the same room on different days)
+distort the signal differently, so a model that classifies perfectly in its
+training environment may collapse on a new one. This is the challenge raised in
+the project proposal, which explicitly suggests a
+\emph{contrastive / self-supervised} approach to obtain subject- and
+environment-independent features. Prior systems close this gap mostly through
+signal processing---robust phase sanitization and multi-antenna fusion---at the
+cost of a heavy, hand-engineered pipeline~\cite{sharp}; we instead ask how far a
+purely \emph{representation-learning} remedy can go on top of a minimal
+front-end.
+
+In this report we tackle five-class Wi-Fi HAR under a strict cross-domain
+protocol (train on a single environment, test on six unseen ones) and study
+whether Supervised Contrastive Learning (SupCon)~\cite{supcon} can \emph{learn}
+environment invariance rather than engineering it. The approach is
+data-efficient---it reuses the same small training set and a lightweight
+encoder---and its value is that the learned features can be reused by any
+downstream classifier and combined with the orthogonal signal-processing tools
+of the reference system. The report is organized around two clearly separated
+contributions:
+\begin{itemize}
+  \item \textbf{Baseline (M.~Carraro).} A faithful reimplementation, in plain
+  PyTorch, of the dataset pipeline and of the baseline Inception-style CNN, with
+  a cross-domain evaluation protocol (train on $S1$, test on $S2$--$S7$) and a
+  per-measurement-set error breakdown.
+  \item \textbf{Contrastive extension (F.~Vezzani).} A Supervised Contrastive
+  Learning stage (notebook~\S9): a deeper batch-normalized encoder is pre-trained
+  with a supervised-contrastive loss and domain-randomization augmentations to
+  learn environment-invariant features, then evaluated with a linear probe under
+  the same protocol. It improves cross-domain accuracy over the baseline on
+  every set.
+\end{itemize}
+We use the full SHARP system~\cite{sharp} as the reference upper bound and
+discuss, quantitatively, why both of our models sit below it and what the
+contrastive stage does and does not recover.
+
+The remainder of the report is structured as follows.
+\secref{sec:related_work} reviews the related work on Wi-Fi sensing and
+contrastive representation learning. \secref{sec:processing_architecture} gives
+a high-level view of the processing pipeline; \secref{sec:model} details the
+signals and features, and \secref{sec:learning_framework} describes the two
+learning frameworks (baseline CNN and SupCon extension). The experimental
+results and the comparison against the SHARP paper are reported in
+\secref{sec:results}, and \secref{sec:conclusions} draws the concluding remarks.

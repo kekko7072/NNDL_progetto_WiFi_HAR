@@ -1,0 +1,146 @@
+% !TEX root = report.tex
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Baseline}
+On the pooled unseen test set the baseline reaches $\mathbf{48.2\%}$ accuracy
+(test loss $1.052$); per set it ranges from $45.5\%$ ($S2$) to $52.3\%$ ($S7$)
+(\tab{tab:compare}). Its confusion matrix
+(\fig{fig:cm}\,(a)) shows two dominant error modes: \emph{sitting still} is
+absorbed by \emph{empty} ($L\!\rightarrow\!E$: $0.76$)---both are near-static and
+concentrate energy at zero Doppler velocity---and \emph{running}/\emph{walking}
+are heavily confused with each other ($W\!\rightarrow\!R$: $0.39$,
+$R\!\rightarrow\!W$: $0.28$).
+
+\subsection{Contrastive model}
+Fitting the linear probe on the frozen SupCon encoder raises overall accuracy to
+$\mathbf{53.1\%}$ (validation $58.3\%$), an improvement of $+4.9$ points over the
+baseline that holds on \emph{every} measurement set
+(\tab{tab:compare}): the largest gains are on $S3$
+($+8.3$, unseen person) and $S7$ ($+5.9$, all-new). Its confusion matrix
+(\fig{fig:cm}\,(b)) improves \emph{running} recall markedly
+($0.53\!\rightarrow\!0.56$ and, more importantly, fewer cross-class leaks) while
+the low-motion $L\!\rightarrow\!E$ confusion softens ($0.76\!\rightarrow\!0.52$).
+
+The t-SNE projection (\fig{fig:tsne}) is the most informative result.
+Colored by \emph{environment} (right), the points are thoroughly mixed---the
+SupCon objective \emph{did} achieve its design goal of an environment-invariant
+representation. Colored by \emph{activity} (left), the space splits cleanly into
+a low-motion lobe (\emph{empty}, \emph{sitting}) and a high-motion lobe
+(\emph{jumping}, \emph{running}, \emph{walking}), but the individual activities
+\emph{within} each lobe remain partly entangled. Contrastive learning thus
+removed the \emph{domain} nuisance but exposed a harder, intrinsic limit: a
+single-antenna $\approx\!2$\,s Doppler window does not fully separate the
+activities, whichever way it is encoded. Consistently, the SupCon loss decreased
+only from $\sim\!4.6$ to $\sim\!4.4$ with a noisy validation curve---the
+pre-training did not fully converge.
+
+Interestingly, \emph{end-to-end fine-tuning} of the encoder \emph{hurts}: it
+drops back to $48.4\%$, essentially the baseline level. Freezing the
+contrastively-pretrained encoder is what generalizes; fine-tuning lets the
+network re-overfit the single training environment. Two caveats temper the
+headline gain: the small baseline is high-variance across runs (a separate run
+reached $\sim\!53\%$), so the $+4.9$-point improvement is best read as
+indicative and would ideally be confirmed over several seeds; and, as
+\tab{tab:compare} shows, both models stay far below full SHARP.
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}{0.49\columnwidth}
+    \includegraphics[width=\textwidth]{confusion_overall.png}
+    \caption{Baseline}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.49\columnwidth}
+    \includegraphics[width=\textwidth]{cl_confusion.png}
+    \caption{Contrastive}
+  \end{subfigure}
+  \caption{Row-normalized confusion matrices on all unseen test environments.
+  The contrastive model (b) reduces the low-motion $L\!\rightarrow\!E$ confusion
+  and sharpens \emph{running} relative to the baseline (a).}
+  \label{fig:cm}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{cl_tsne.png}
+  \caption{t-SNE of the test embeddings learned by the SupCon encoder.
+  \emph{Left}, colored by activity: a low-motion lobe (\emph{empty},
+  \emph{sitting}) and a high-motion lobe (\emph{jumping}, \emph{running},
+  \emph{walking}). \emph{Right}, the same points colored by environment: the
+  colors are mixed \emph{inside} the structure, i.e.\ the representation is
+  organized by \emph{activity}, not by \emph{environment}---the intended
+  environment-invariance.}
+  \label{fig:tsne}
+\end{figure}
+
+\subsection{Comparison with the SHARP paper}
+\tab{tab:compare} places our results next to the SHARP paper~\cite{sharp}.
+Two SHARP columns are shown: the \emph{full} system (strongest-path phase
+sanitization $+$ 4-antenna decision fusion) and an \emph{ablation} that replaces
+the strongest-path sanitization with the standard reference-antenna method,
+feeding the \emph{same} CNN (\cite{sharp}, Table~4). Full SHARP stays above
+$95\%$ on every unseen set. Our contrastive model ($53.1\%$) reaches roughly the
+level of SHARP's single-component ablation ($\sim\!53\%$ mean), and our baseline
+sits just below it. The $\sim\!45$-point gap to full SHARP is thus explained by
+the two ingredients we do not implement (\secref{sec:discussion}), not by a bug
+in either model.
+
+\begin{table}[t]
+  \centering
+  \caption{Per-set accuracy (\%): training on $S1$, testing on unseen sets, all
+  from one run. Ours: single-antenna baseline (M.~Carraro) and SupCon
+  linear-probe (F.~Vezzani). SHARP-full and SHARP-ablation from \cite{sharp}
+  (Tables~3 and~4). Higher is better.}
+  \label{tab:compare}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+     & \multicolumn{2}{c}{\textbf{Ours (this work)}} & \multicolumn{2}{c}{\textbf{SHARP~\cite{sharp}}}\\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Set & Baseline & Contrastive & Full & Ablation\\
+        & (Carraro) & (Vezzani) & (fusion) & (1 ant.)\\
+    \midrule
+    $S2$ & $45.5$ & $51.1$ & $99.8$ & $59.8$\\
+    $S3$ & $51.4$ & $59.7$ & $99.3$ & $58.0$\\
+    $S4$ & $48.5$ & $51.9$ & $97.6$ & $43.5$\\
+    $S5$ & $47.5$ & $52.9$ & $96.6$ & $39.2$\\
+    $S6$ & $48.1$ & $51.3$ & $99.8$ & $59.4$\\
+    $S7$ & $52.3$ & $58.2$ & $96.0$ & $60.3$\\
+    \midrule
+    \textbf{Overall} & $\mathbf{48.2}$ & $\mathbf{53.1}$ & $\sim\!98$ & $\sim\!53$\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Discussion}
+\label{sec:discussion}
+
+\paragraph{Why both models are far from SHARP}
+Full SHARP owes its environment independence to two mechanisms we lack.
+\emph{(i) Multi-antenna decision fusion:} SHARP runs the single-antenna
+classifier on each of the four antennas and combines the four decisions; input
+concatenation is markedly worse (e.g.\ $81.7\%\!\rightarrow\!96.6\%$ on $S5$) and
+accuracy grows monotonically with the number of fused antennas~\cite{sharp}, so
+our single-antenna model sits at the low end. \emph{(ii) Robust phase
+sanitization:} SHARP uses the \emph{strongest} multipath component as phase
+reference; its own ablation shows the standard reference-antenna method makes the
+\emph{same} CNN collapse from $>95\%$ to $39$--$60\%$ (\tab{tab:compare}, last
+column)---right where our models land. Two further factors matter: we use
+\emph{non-overlapping} windows (SHARP slides the window, yielding far more
+samples) and train on a single small environment, making the baseline
+high-variance.
+
+\paragraph{What the contrastive extension achieves}
+The SupCon stage attacks domain shift from the \emph{representation} side rather
+than the signal-processing side: it \emph{learns} an embedding in which
+same-activity windows cluster across domains, aided by the domain-randomization
+augmentations. The t-SNE (\fig{fig:tsne}) confirms this worked---the space is
+environment-invariant---and the linear probe improves accuracy on every set. Yet
+overall accuracy is still about half that of full SHARP, because the residual
+errors are \emph{activity} confusions (walking vs.\ running, sitting vs.\ empty),
+not \emph{domain} shift. The two ideas are thus \emph{complementary}: contrastive
+learning handles the domain axis, while separating the activities most likely
+requires the multi-antenna information that SHARP's fusion exploits. Combining the
+frozen SupCon encoder (which generalizes far better than fine-tuning) with antenna
+fusion is the most promising direction left open.

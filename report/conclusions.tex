@@ -1,0 +1,34 @@
+% !TEX root = report.tex
+
+\section{Concluding Remarks}
+\label{sec:conclusions}
+
+We reproduced and evaluated a baseline Wi-Fi HAR pipeline under a strict
+cross-domain protocol ($48.2\%$ on unseen environments) and added a Supervised
+Contrastive Learning extension that improves cross-domain accuracy on every
+measurement set ($53.1\%$ overall, $+4.9$ points). A t-SNE analysis shows that
+the extension achieves its intended goal---an environment-invariant
+representation---while a direct comparison with the SHARP paper~\cite{sharp}
+places both models well below the full pipeline, whose multi-antenna decision
+fusion and strongest-path phase sanitization we do not implement.
+
+The practical value of the extension is that it recovers domain robustness
+\emph{on the learning side}, with a lightweight encoder, no extra
+signal-processing, and a frozen, reusable feature space. Since its residual
+errors are \emph{activity} confusions rather than \emph{domain} shift, the
+contrastive encoder is complementary to SHARP's antenna fusion: the clearest next
+step is to combine the two---keeping the frozen encoder---ideally with a
+sliding-window dataset and multi-seed runs.
+
+\paragraph{What we learned and difficulties encountered}
+The main lesson was that a strict, environment-based split changes the story:
+modest-looking numbers ($\sim\!50\%$) are the honest cost of never seeing the
+test environment, which a random split would have hidden. The t-SNE proved
+valuable as a diagnostic---it revealed that contrastive learning had solved the
+\emph{domain} axis but not the \emph{activity} axis. The main difficulties were:
+(i) getting SupCon pre-training to converge (the loss barely moved), so the
+representation is useful but under-trained; (ii) the counter-intuitive finding
+that end-to-end fine-tuning \emph{hurt} generalization by re-overfitting the
+single environment, which taught us to trust the frozen-encoder / linear-probe
+evaluation; and (iii) the high run-to-run variance of the small baseline, which
+makes single-run comparisons fragile and calls for multi-seed averaging.
