@@ -205,15 +205,15 @@ evaluation reports.
     arr/.style={->, thick, black!65},
   ]
     \node[input] (in) at (0,0) {INPUT\\1@(340$\times$100)};
-    \node[pool] (mp)  at (3.2,1.7)  {MAXPOOL\\(2$\times$2) S2};
-    \node[conv] (b2)  at (3.2,0.0)  {CONV 5@(2$\times$2)\\S2-ReLU};
-    \node[conv] (b3a) at (2.6,-1.9) {CONV 3@(1$\times$1)\\S1-ReLU};
-    \node[conv] (b3b) at (5.0,-1.9) {CONV 6@(2$\times$2)\\S1-ReLU};
-    \node[conv] (b3c) at (7.4,-1.9) {CONV 9@(4$\times$4)\\S2-ReLU};
-    \node[op]   (cat) at (7.4,0.6)  {CONCAT\\(15 maps)};
-    \node[conv] (red) at (1.2,-4.3) {CONV 3@(1$\times$1)\\S1-ReLU};
-    \node[op]   (fc)  at (4.3,-4.3) {FLATTEN\\DROPOUT(0.2)\\DENSE};
-    \node[term] (lab) at (7.4,-4.3) {ACTIVITY\\LABEL};
+    \node[pool] (mp)  at (3.6,1.8)   {MAXPOOL\\(2$\times$2) S2};
+    \node[conv] (b2)  at (3.6,0.2)   {CONV 5@(2$\times$2)\\S2-ReLU};
+    \node[conv] (b3a) at (3.2,-2.0)  {CONV 3@(1$\times$1)\\S1-ReLU};
+    \node[conv] (b3b) at (6.8,-2.0)  {CONV 6@(2$\times$2)\\S1-ReLU};
+    \node[conv] (b3c) at (10.2,-2.0) {CONV 9@(4$\times$4)\\S2-ReLU};
+    \node[op]   (cat) at (10.2,0.6)  {CONCAT\\(15 maps)};
+    \node[conv] (red) at (2.4,-4.7)  {CONV 3@(1$\times$1)\\S1-ReLU};
+    \node[op]   (fc)  at (6.4,-4.7)  {FLATTEN--DROPOUT(0.2)\\DENSE};
+    \node[term] (lab) at (10.2,-4.7) {ACTIVITY\\LABEL};
 
     \draw[arr] (in.east) -- (mp.west);
     \draw[arr] (in.east) -- (b2.west);
@@ -223,7 +223,7 @@ evaluation reports.
     \draw[arr] (mp.east)  -| (cat.north);
     \draw[arr] (b2.east)  -- (cat.west);
     \draw[arr] (b3c.north) -- (cat.south);
-    \draw[arr] (cat.east) -- ++(1.1,0) |- (-1.4,-4.3) -- (red.west);
+    \draw[arr] (cat.east) -- ++(0.9,0) -- ++(0,-3.4) -| (red.north);
     \draw[arr] (red.east) -- (fc.west);
     \draw[arr] (fc.east)  -- (lab.west);
   \end{tikzpicture}%

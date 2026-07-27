@@ -40,19 +40,19 @@ while fine-tuning re-overfits the single training environment.
 \begin{figure*}[t]
   \centering
   \begin{subfigure}{0.245\textwidth}
-    \includegraphics[width=\textwidth]{confusion_overall.png}
+    \includegraphics[width=\textwidth]{confusion_overall_c.png}
     \caption{baseline, fast schedule}
   \end{subfigure}\hfill
   \begin{subfigure}{0.245\textwidth}
-    \includegraphics[width=\textwidth]{cl_confusion.png}
+    \includegraphics[width=\textwidth]{cl_confusion_c.png}
     \caption{SupCon linear probe}
   \end{subfigure}\hfill
   \begin{subfigure}{0.245\textwidth}
-    \includegraphics[width=\textwidth]{confusion_v3_single.png}
+    \includegraphics[width=\textwidth]{confusion_v3_single_c.png}
     \caption{baseline, slow schedule}
   \end{subfigure}\hfill
   \begin{subfigure}{0.245\textwidth}
-    \includegraphics[width=\textwidth]{confusion_v3_fused.png}
+    \includegraphics[width=\textwidth]{confusion_v3_fused_c.png}
     \caption{$+$ $4$-antenna fusion}
   \end{subfigure}
   \caption{Row-normalized confusion matrices on all unseen test environments, one
@@ -89,7 +89,7 @@ points here are fragile.
 \subsection{Multi-antenna decision fusion}
 Averaging the four per-antenna probability vectors (\eq{eq:fusion}) lifts the
 \emph{same} model from $51.3\%$ to $\mathbf{61.5\%}$: $+10.2$ points overall,
-with per-set gains between $+6.4$ ($S6$) and $+17.4$ ($S7$) and no set left
+with per-set gains between $+7.4$ ($S6$) and $+17.4$ ($S7$) and no set left
 behind (\fig{fig:perset}), for one softmax and one group-average at
 inference---no retraining, no extra parameters.
 
