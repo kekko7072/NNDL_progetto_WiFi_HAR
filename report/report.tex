@@ -73,21 +73,27 @@ by M.~Carraro; Supervised Contrastive Learning extension by F.~Vezzani.}
 \begin{abstract}
 We study device-free human activity recognition (HAR) from the Doppler
 spectrograms of Wi-Fi channel-state information (CSI), using the publicly
-released traces of the SHARP dataset~\cite{sharp,csidataset}. We first reproduce
-the Inception-style convolutional baseline of the course material (developed by
-M.~Carraro): trained \emph{only} on measurement set~$S1$ and evaluated on the
-six unseen sets $S2$--$S7$, it reaches $48.2\%$ accuracy on the unseen domains,
-quantifying how hard cross-domain generalization is when no domain-invariance
-mechanism is used. We then add a Supervised Contrastive Learning (SupCon)
-extension (developed by F.~Vezzani): a deeper, batch-normalized encoder is
-pre-trained with a supervised-contrastive objective and domain-randomization
-augmentations, and a linear probe is fit on the frozen representation. This
-raises accuracy to $53.1\%$, improving over the baseline on \emph{every}
-measurement set ($+4.9$ points overall), and a t-SNE analysis confirms the
-learned space is environment-invariant. Both models remain well below the full
-SHARP pipeline ($>95\%$ on every set), whose strongest-path phase sanitization
-and multi-antenna \emph{decision fusion} we do not implement; we analyse this
-gap and argue that the two ideas are complementary.
+released traces of the SHARP dataset~\cite{sharp,csidataset}. Starting from the
+Inception-style convolutional baseline of the course material---trained
+\emph{only} on measurement set~$S1$ and evaluated on the six unseen sets
+$S2$--$S7$, where it reaches $48.2\%$---we add and measure, one at a time, three
+strategies for closing the cross-domain gap without the hand-engineered front-end
+of the reference system. (i) \emph{Supervised contrastive pre-training}: a
+batch-normalized encoder trained with a SupCon objective and domain-randomization
+augmentations, with a linear probe on the frozen representation, gives $53.1\%$
+and improves \emph{every} measurement set, a t-SNE analysis confirming that the
+learned space is environment-invariant. (ii) \emph{A slower optimizer schedule}
+reaches $51.3\%$ while fitting the training environment \emph{worse}, showing
+that on a single-environment training set the two objectives conflict. (iii)
+\emph{Multi-antenna soft decision fusion}: a recording-level group identifier
+threaded through the data pipeline lets the four per-antenna probability vectors
+of one physical time window be averaged, lifting accuracy to $\mathbf{61.5\%}$
+($+10.2$ points, $+6.4$ to $+17.4$ per set) with no retraining and no extra
+parameters---the largest gain we measured, enough to overtake the
+single-component ablation of the reference system. We also report the front-end
+work that makes an overlapping ($91\%$) sliding window affordable in memory. The
+residual gap to the full pipeline ($>95\%$) is attributable to its strongest-path
+phase sanitization, which we do not implement.
 \end{abstract}
 
 \IEEEkeywords
@@ -108,13 +114,12 @@ Convolutional Neural Networks, Contrastive Learning, Domain Generalization.
 %=============================================================================
 \section*{Author Contributions}
 \textbf{Marco Carraro:} dataset/windowing pipeline, baseline Inception CNN,
-training with early stopping, and the cross-domain evaluation (\secref{sec:model}
-and the baseline parts of \secref{sec:learning_framework}--\ref{sec:results}).
-\textbf{Francesco Vezzani:} the Supervised Contrastive Learning extension
-(notebook~\S9)---augmentations, the batch-normalized encoder with global average
-pooling, the projection head and SupCon loss, contrastive pre-training,
-linear-probe / fine-tuning evaluation, and the t-SNE analysis (the contrastive
-parts of \secref{sec:learning_framework}--\ref{sec:results}).
+training with early stopping, cross-domain evaluation. \textbf{Francesco
+Vezzani:} the Supervised Contrastive Learning extension---augmentations, encoder
+and projection head, SupCon loss, pre-training, linear-probe / fine-tuning
+evaluation, t-SNE. The remaining changes of \tab{tab:versions}---sliding-window
+front-end, group-aware pipeline with decision fusion, optimizer study---were
+carried out jointly.
 
 %=============================================================================
 \bibliography{biblio}

@@ -3,9 +3,9 @@
 \citation{sharp}
 \citation{sharp}
 \citation{supcon}
-\citation{sharp}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
 \newlabel{sec:introduction}{{I}{1}{}{section.1}{}}
+\citation{sharp}
 \citation{sharp}
 \citation{csidataset}
 \citation{simclr}
@@ -13,82 +13,93 @@
 \citation{sharp}
 \citation{sharp}
 \citation{csidataset}
-\citation{sharp}
-\citation{sharp}
-\citation{sharp}
 \@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}{}\protected@file@percent }
 \newlabel{sec:related_work}{{II}{2}{}{section.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {III}Processing Pipeline}{2}{}\protected@file@percent }
 \newlabel{sec:processing_architecture}{{III}{2}{}{section.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces High-level processing pipeline. A shared front-end turns CSI traces into Doppler windows; the baseline chain (M.~Carraro) classifies them directly, while the contrastive chain (F.~Vezzani) learns an environment-invariant representation before a linear probe. Both are assessed with the same cross-domain protocol.}}{2}{}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:pipeline}{{1}{2}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}The changes we evaluate}{2}{}\protected@file@percent }
+\newlabel{sec:versions}{{\mbox  {III-A}}{2}{}{subsection.3.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Signals and Features}{2}{}\protected@file@percent }
 \newlabel{sec:model}{{IV}{2}{}{section.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}The SHARP data}{2}{}\protected@file@percent }
+\citation{sharp}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The modifications evaluated on top of the baseline, the code each one required, and the resulting cross-domain accuracy (train on $S1$, test on $S2$--$S7$, one run). Each is measured against the reference configuration of the first row, changing one thing at a time.}}{3}{}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:versions}{{1}{3}{}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces High-level processing pipeline. A shared front-end turns CSI traces into Doppler windows tagged with a group id; the baseline chain classifies them directly, the contrastive chain learns an environment-invariant representation before a linear probe, and the fusion stage collapses the four per-antenna decisions of one time window into one.}}{3}{}\protected@file@percent }
+\newlabel{fig:pipeline}{{1}{3}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}From traces to windows}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces One Doppler-spectrogram window per activity (transposed: rows are the $100$ velocity bins, columns the $340$ time samples). Low-motion classes concentrate energy at zero velocity; \emph  {running}/\emph  {jumping} spread it over a wide velocity range.}}{3}{}\protected@file@percent }
+\newlabel{fig:activities}{{2}{3}{}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Cross-domain split}{3}{}\protected@file@percent }
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
 \citation{supcon}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces One example Doppler-spectrogram window per activity (input to the network, transposed for readability: rows are the $100$ Doppler-velocity bins, columns are the $340$ time samples $\approx 2$\,s). Low-motion classes (\emph  {empty}, \emph  {sitting still}) concentrate energy around zero velocity, while \emph  {running}/\emph  {jumping} spread energy over a wide velocity range.}}{3}{}\protected@file@percent }
-\newlabel{fig:activities}{{2}{3}{}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Measurement sets of the SHARP dataset (after~\cite  {sharp}, Table~1). $Mj$: monitor position; $Pi$: person; LOS: direct path present.}}{3}{}\protected@file@percent }
-\newlabel{tab:conditions}{{1}{3}{}{table.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}From traces to windows}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Cross-domain split}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Learning Framework}{3}{}\protected@file@percent }
-\newlabel{sec:learning_framework}{{V}{3}{}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Baseline CNN (M.~Carraro)}{3}{}\protected@file@percent }
-\newlabel{sec:baseline}{{\mbox  {V-A}}{3}{}{subsection.5.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Contrastive extension: Supervised Contrastive Learning (F.~Vezzani)}{3}{}\protected@file@percent }
-\newlabel{sec:contrastive}{{\mbox  {V-B}}{3}{}{subsection.5.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}1}Motivation}{3}{}\protected@file@percent }
-\citation{simclr}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Baseline single-antenna classification architecture (M.~Carraro), a faithful reproduction of the SHARP reduced-Inception module~(\cite  {sharp}, Fig.~4). Three parallel branches (max-pool / strided conv / three stacked convs) extract multi-scale Doppler features; the maps are concatenated ($1{+}5{+}9=15$), reduced to $3$ by a $1\times 1$ convolution, then flattened and classified by a dense layer with dropout ($128{,}535$ parameters). \texttt  {S2} denotes stride~2; every CONV is followed by a ReLU.}}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Baseline single-antenna architecture, a faithful reproduction of the SHARP reduced-Inception module~(\cite  {sharp}, Fig.~4). \texttt  {S2} denotes stride~2; every CONV is followed by a ReLU ($128{,}535$ parameters).}}{4}{}\protected@file@percent }
 \newlabel{fig:baseline_arch}{{3}{4}{}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Baseline training. Left: cross-entropy loss; right: accuracy. Validation accuracy plateaus near $0.52$ while training accuracy keeps rising, i.e.\ the model overfits the single training set $S1$; early stopping halts training at epoch~13.}}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Learning Framework}{4}{}\protected@file@percent }
+\newlabel{sec:learning_framework}{{V}{4}{}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Baseline CNN (M.~Carraro)}{4}{}\protected@file@percent }
+\newlabel{sec:baseline}{{\mbox  {V-A}}{4}{}{subsection.5.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces The optimizer schedules compared; everything else (architecture, data, seed, batch size, split) is held fixed. ``Stop'' is the epoch early stopping fired at, in parentheses the epoch whose weights were restored.}}{4}{}\protected@file@percent }
+\newlabel{tab:schedule}{{2}{4}{}{table.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Baseline train/validation accuracy under the two optimizer schedules. In (a) the training curve detaches from the validation one after $\approx \!6$ epochs---overfitting the single training environment. In (b) the two stay glued together and stop at a training accuracy of $0.575$: the model is \emph  {under}-fitted, and yet generalizes better (Tab.~\ref {tab:compare}).}}{4}{}\protected@file@percent }
 \newlabel{fig:curves}{{4}{4}{}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Contrastive extension: Supervised Contrastive Learning (F.~Vezzani)}{4}{}\protected@file@percent }
+\newlabel{sec:contrastive}{{\mbox  {V-B}}{4}{}{subsection.5.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}1}Motivation}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}2}Domain-randomization augmentations}{4}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}3}Encoder and projection head}{4}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces A window (\emph  {left}) and two augmented views. Amplitude scaling and Gaussian noise change the texture; the circular time shift and the SpecAugment-style time/Doppler masks (dark bands) hide parts of the pattern, while the activity signature (the horizontal energy band) is preserved.}}{4}{}\protected@file@percent }
-\newlabel{fig:aug}{{5}{4}{}{figure.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Contrastive encoder $f(\cdot )$; output sizes for a $1\times 340\times 100$ input. BN$+$ReLU follow every convolution; ``sN'' denotes stride~N (default stride~1). The pooling output is the $128$-d representation $h$.}}{4}{}\protected@file@percent }
-\newlabel{tab:encoder}{{2}{4}{}{table.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}4}SupCon loss}{4}{}\protected@file@percent }
-\newlabel{eq:supcon}{{1}{4}{}{equation.1}{}}
+\citation{simclr}
 \citation{sharp}
-\citation{sharp}
-\citation{sharp}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces A window (\emph  {left}) and two augmented views: scaling and noise change the texture, the circular shift and the SpecAugment-style masks (dark bands) hide parts of the pattern, while the activity signature (the horizontal energy band) survives.}}{5}{}\protected@file@percent }
+\newlabel{fig:aug}{{5}{5}{}{figure.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}3}Encoder and projection head}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}4}SupCon loss}{5}{}\protected@file@percent }
+\newlabel{eq:supcon}{{1}{5}{}{equation.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-B}5}Training and evaluation protocol}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Multi-antenna decision fusion}{5}{}\protected@file@percent }
+\newlabel{sec:fusion}{{\mbox  {V-C}}{5}{}{subsection.5.3}{}}
+\newlabel{eq:fusion}{{2}{5}{}{equation.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Results}{5}{}\protected@file@percent }
 \newlabel{sec:results}{{VI}{5}{}{section.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Baseline}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Contrastive model}{5}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Row-normalized confusion matrices on all unseen test environments. The contrastive model (b) reduces the low-motion $L\!\rightarrow \!E$ confusion and sharpens \emph  {running} relative to the baseline (a).}}{5}{}\protected@file@percent }
-\newlabel{fig:cm}{{6}{5}{}{figure.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces t-SNE of the test embeddings learned by the SupCon encoder. \emph  {Left}, colored by activity: a low-motion lobe (\emph  {empty}, \emph  {sitting}) and a high-motion lobe (\emph  {jumping}, \emph  {running}, \emph  {walking}). \emph  {Right}, the same points colored by environment: the colors are mixed \emph  {inside} the structure, i.e.\ the representation is organized by \emph  {activity}, not by \emph  {environment}---the intended environment-invariance.}}{5}{}\protected@file@percent }
-\newlabel{fig:tsne}{{7}{5}{}{figure.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Comparison with the SHARP paper}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Contrastive representation}{5}{}\protected@file@percent }
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
 \citation{sharp}
+\citation{sharp}
+\citation{sharp}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Optimizer schedule}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Multi-antenna decision fusion}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Sliding-window front-end}{6}{}\protected@file@percent }
+\newlabel{sec:sliding}{{\mbox  {VI-E}}{6}{}{subsection.6.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Per-set accuracy (\%), training on $S1$: single-antenna baseline under the two schedules of Tab.~\ref {tab:schedule}, SupCon linear probe, and the slow-schedule baseline with $4$-antenna fusion (same weights). SHARP columns from \cite  {sharp} (Tables~3 and~4).}}{6}{}\protected@file@percent }
+\newlabel{tab:compare}{{3}{6}{}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-F}}Comparison with the SHARP paper}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-G}}Discussion}{6}{}\protected@file@percent }
+\newlabel{sec:discussion}{{\mbox  {VI-G}}{6}{}{subsection.6.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-G}0a}What each change bought}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-G}0b}Why we are still far from SHARP}{6}{}\protected@file@percent }
+\citation{sharp}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Row-normalized confusion matrices on all unseen test environments, one per configuration. The contrastive representation (b) softens the low-motion $L\!\rightarrow \!E$ confusion of the baseline (a); fusion (d) raises every motion class of the model in (c) with the same weights, but leaves \emph  {sitting}$\rightarrow $\emph  {empty} in place---the antennas agree with each other when there is no motion to disagree about.}}{7}{}\protected@file@percent }
+\newlabel{fig:cm}{{6}{7}{}{figure.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces t-SNE of the test embeddings of the SupCon encoder. \emph  {Left}, colored by activity: a low-motion and a high-motion lobe. \emph  {Right}, the same points colored by environment: the colors are mixed \emph  {inside} the structure, i.e.\ the space is organized by \emph  {activity}, not by \emph  {environment}.}}{7}{}\protected@file@percent }
+\newlabel{fig:tsne}{{7}{7}{}{figure.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Cross-domain accuracy per measurement set for the four configurations of Tab.~\ref {tab:compare} (dashed line: the $20\%$ chance level). Every unseen set benefits from the contrastive representation and, much more, from antenna fusion.}}{7}{}\protected@file@percent }
+\newlabel{fig:perset}{{8}{7}{}{figure.8}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-G}0c}The two remedies are complementary}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Concluding Remarks}{7}{}\protected@file@percent }
+\newlabel{sec:conclusions}{{VII}{7}{}{section.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VII-}0a}What we learned and difficulties encountered}{7}{}\protected@file@percent }
 \bibdata{biblio}
 \bibcite{sharp}{1}
 \bibcite{csidataset}{2}
 \bibcite{supcon}{3}
 \bibcite{simclr}{4}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Per-set accuracy (\%): training on $S1$, testing on unseen sets, all from one run. Ours: single-antenna baseline (M.~Carraro) and SupCon linear-probe (F.~Vezzani). SHARP-full and SHARP-ablation from \cite  {sharp} (Tables~3 and~4). Higher is better.}}{6}{}\protected@file@percent }
-\newlabel{tab:compare}{{3}{6}{}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Discussion}{6}{}\protected@file@percent }
-\newlabel{sec:discussion}{{\mbox  {VI-D}}{6}{}{subsection.6.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-D}0a}Why both models are far from SHARP}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VI-D}0b}What the contrastive extension achieves}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Concluding Remarks}{6}{}\protected@file@percent }
-\newlabel{sec:conclusions}{{VII}{6}{}{section.7}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {VII-}0a}What we learned and difficulties encountered}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
 \bibstyle{ieeetr}
-\gdef \@abspage@last{7}
+\@writefile{toc}{\contentsline {section}{References}{8}{}\protected@file@percent }
+\gdef \@abspage@last{8}

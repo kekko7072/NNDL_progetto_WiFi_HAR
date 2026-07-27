@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.4)  27 JUL 2026 10:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.4)  27 JUL 2026 16:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -747,67 +747,96 @@ LaTeX Font Warning: Font shape `OMS/cmtt/m/n' undefined
 (Font)              for symbol `textbraceleft' on input line 70.
 
 (./intro.tex
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 4
-3.
+Underfull \vbox (badness 4543) has occurred while \output is active []
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/psnfss/ts1ptm.fd
-File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-)) [1{/usr/local/texlive/2026basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map
-}{/usr/local/texlive/2026basic/texmf-dist/fonts/enc/dvips/base/8r.enc}
+ [1{/usr/local/texlive/2026basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{
+/usr/local/texlive/2026basic/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 
-] (./related.tex)
-(./model.tex
-<./figures/doppler_activities.png, id=22, 1076.1003pt x 209.583pt>
+]
+Underfull \hbox (badness 1424) in paragraph at lines 53--59
+\OT1/ptm/m/n/10 overlapping seg-men-ta-tion, sup-ported by a two-pass,
+ []
+
+) (./related.tex) (./model.tex
+<./figures/doppler_activities.png, id=23, 1076.1003pt x 209.583pt>
 File: ./figures/doppler_activities.png Graphic file (type png)
 <use ./figures/doppler_activities.png>
-Package pdftex.def Info: ./figures/doppler_activities.png  used on input line 7
-0.
-(pdftex.def)             Requested size: 516.0pt x 100.49954pt.
- [2]
-<./figures/training_curves.png, id=31, 859.2903pt x 281.853pt>
-File: ./figures/training_curves.png Graphic file (type png)
-<use ./figures/training_curves.png>
-Package pdftex.def Info: ./figures/training_curves.png  used on input line 229.
+Package pdftex.def Info: ./figures/doppler_activities.png  used on input line 1
+22.
+(pdftex.def)             Requested size: 250.77312pt x 48.83946pt.
 
-(pdftex.def)             Requested size: 250.77312pt x 82.25566pt.
- [3 <./figures/doppler_activities.png>]
-Underfull \hbox (badness 2376) in paragraph at lines 262--265
+Underfull \hbox (badness 2809) in paragraph at lines 131--140
+\OT1/ptm/m/n/10 Doppler-velocity bins---from a sin-gle re-ceiv-ing an-tenna
+ []
+
+[2] [3 <./figures/doppler_activities.png>]
+<./figures/acc_fast.png, id=38, 597.23125pt x 391.4625pt>
+File: ./figures/acc_fast.png Graphic file (type png)
+<use ./figures/acc_fast.png>
+Package pdftex.def Info: ./figures/acc_fast.png  used on input line 297.
+(pdftex.def)             Requested size: 122.8802pt x 80.54301pt.
+<./figures/acc_slow.png, id=39, 597.23125pt x 391.4625pt>
+File: ./figures/acc_slow.png Graphic file (type png)
+<use ./figures/acc_slow.png>
+Package pdftex.def Info: ./figures/acc_slow.png  used on input line 301.
+(pdftex.def)             Requested size: 122.8802pt x 80.54301pt.
+
+Underfull \hbox (badness 2376) in paragraph at lines 334--337
 []\OT1/ptm/b/n/10 amplitude scal-ing \OT1/ptm/m/n/10 by a per-window ran-dom ga
 in
  []
 
-<./figures/augment_views.png, id=37, 787.743pt x 209.583pt>
+[4 <./figures/acc_fast.png> <./figures/acc_slow.png>]
+<./figures/augment_views.png, id=47, 787.743pt x 209.583pt>
 File: ./figures/augment_views.png Graphic file (type png)
 <use ./figures/augment_views.png>
-Package pdftex.def Info: ./figures/augment_views.png  used on input line 275.
+Package pdftex.def Info: ./figures/augment_views.png  used on input line 347.
 (pdftex.def)             Requested size: 250.77312pt x 66.71935pt.
-[4 <./figures/training_curves.png> <./figures/augment_views.png>])
-(./results.tex
-<./figures/confusion_overall.png, id=47, 366.4089pt x 328.8285pt>
+) (./results.tex [5 <./figures/augment_views.png>]
+<./figures/confusion_overall.png, id=56, 366.4089pt x 328.8285pt>
 File: ./figures/confusion_overall.png Graphic file (type png)
 <use ./figures/confusion_overall.png>
-Package pdftex.def Info: ./figures/confusion_overall.png  used on input line 51
+Package pdftex.def Info: ./figures/confusion_overall.png  used on input line 45
 .
-(pdftex.def)             Requested size: 122.8802pt x 110.27489pt.
-<./figures/cl_confusion.png, id=48, 366.4089pt x 328.8285pt>
+(pdftex.def)             Requested size: 126.41748pt x 113.45097pt.
+<./figures/cl_confusion.png, id=57, 366.4089pt x 328.8285pt>
 File: ./figures/cl_confusion.png Graphic file (type png)
 <use ./figures/cl_confusion.png>
-Package pdftex.def Info: ./figures/cl_confusion.png  used on input line 55.
-(pdftex.def)             Requested size: 122.8802pt x 110.27489pt.
-<./figures/cl_tsne.png, id=49, 931.5603pt x 354.123pt>
+Package pdftex.def Info: ./figures/cl_confusion.png  used on input line 49.
+(pdftex.def)             Requested size: 126.41748pt x 113.45097pt.
+<./figures/confusion_v3_single.png, id=58, 366.4089pt x 328.8285pt>
+File: ./figures/confusion_v3_single.png Graphic file (type png)
+<use ./figures/confusion_v3_single.png>
+Package pdftex.def Info: ./figures/confusion_v3_single.png  used on input line 
+53.
+(pdftex.def)             Requested size: 126.41748pt x 113.45097pt.
+<./figures/confusion_v3_fused.png, id=59, 424.9476pt x 328.8285pt>
+File: ./figures/confusion_v3_fused.png Graphic file (type png)
+<use ./figures/confusion_v3_fused.png>
+Package pdftex.def Info: ./figures/confusion_v3_fused.png  used on input line 5
+7.
+(pdftex.def)             Requested size: 126.41748pt x 97.82141pt.
+<./figures/cl_tsne.png, id=60, 931.5603pt x 354.123pt>
 File: ./figures/cl_tsne.png Graphic file (type png)
 <use ./figures/cl_tsne.png>
-Package pdftex.def Info: ./figures/cl_tsne.png  used on input line 66.
+Package pdftex.def Info: ./figures/cl_tsne.png  used on input line 71.
 (pdftex.def)             Requested size: 250.77312pt x 95.3281pt.
- [5 <./figures/confusion_overall.png> <./figures/cl_confusion.png> <./figures/c
-l_tsne.png>]) (./conclusions.tex) (./report.bbl
+<./figures/perset_accuracy.png, id=61, 247.8861pt x 152.4897pt>
+File: ./figures/perset_accuracy.png Graphic file (type png)
+<use ./figures/perset_accuracy.png>
+Package pdftex.def Info: ./figures/perset_accuracy.png  used on input line 114.
+
+(pdftex.def)             Requested size: 250.77312pt x 154.27164pt.
+ [6]) (./conclusions.tex) [7 <./figures/confusion_overall.png> <./figures/cl_co
+nfusion.png> <./figures/confusion_v3_single.png> <./figures/confusion_v3_fused.
+png> <./figures/cl_tsne.png> <./figures/perset_accuracy.png>] (./report.bbl
 Underfull \hbox (badness 2065) in paragraph at lines 15--19
 []\OT1/ptm/m/n/8 P. Khosla, P. Teter-wak, C. Wang, A. Sarna, Y. Tian, P. Isola,
 
  []
 
-[6])
+)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -819,7 +848,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7
+[8
 
 ] (./report.aux)
  ***********
@@ -832,41 +861,44 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 17264 strings out of 469006
- 348278 string characters out of 5454814
- 734600 words of memory out of 5000000
- 45638 multiletter control sequences out of 15000+600000
- 678871 words of font info for 155 fonts, out of 8000000 for 9000
+ 17293 strings out of 469006
+ 349258 string characters out of 5454814
+ 737748 words of memory out of 5000000
+ 45671 multiletter control sequences out of 15000+600000
+ 678557 words of font info for 154 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 84i,11n,94p,641b,902s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,12n,94p,561b,897s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx1
 0.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mbx8.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmex10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmmi10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmmi7.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmmi9.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/t
-ype1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2026basic/texmf-dist/font
-s/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2026basic/texmf-dist/fo
-nts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026basic/texmf-dist/
-fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2026basic/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026basic/texmf
--dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2026basic/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2026basic
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2026ba
-sic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/202
-6basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive
-/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texl
-ive/2026basic/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2
-026basic/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2026b
-asic/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2026basic/
-texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (7 pages, 717771 bytes).
+m/cmbx9.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmex10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmmi10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmmi5.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmmi9.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2026basic/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2026basic/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2026basic/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2026basic/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026basic/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2026basic/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026bas
+ic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2026
+basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2
+026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texliv
+e/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/tex
+live/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local
+/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/lo
+cal/texlive/2026basic/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/t
+exlive/2026basic/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texli
+ve/2026basic/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
+26basic/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (8 pages, 876099 bytes).
 PDF statistics:
- 160 PDF objects out of 1000 (max. 8388607)
- 92 compressed objects within 1 object stream
+ 187 PDF objects out of 1000 (max. 8388607)
+ 103 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 43 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 63 words of extra memory for PDF output out of 10000 (max. 10000000)
 

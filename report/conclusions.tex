@@ -3,32 +3,31 @@
 \section{Concluding Remarks}
 \label{sec:conclusions}
 
-We reproduced and evaluated a baseline Wi-Fi HAR pipeline under a strict
-cross-domain protocol ($48.2\%$ on unseen environments) and added a Supervised
-Contrastive Learning extension that improves cross-domain accuracy on every
-measurement set ($53.1\%$ overall, $+4.9$ points). A t-SNE analysis shows that
-the extension achieves its intended goal---an environment-invariant
-representation---while a direct comparison with the SHARP paper~\cite{sharp}
-places both models well below the full pipeline, whose multi-antenna decision
-fusion and strongest-path phase sanitization we do not implement.
+Starting from a baseline Wi-Fi HAR pipeline evaluated under a strict cross-domain
+protocol ($48.2\%$ on unseen environments), we implemented and measured three
+strategies one at a time: a supervised-contrastive representation ($53.1\%$,
+better on every measurement set, with a t-SNE confirming environment-invariance),
+a slower optimizer schedule ($51.3\%$), and multi-antenna soft decision fusion,
+which lifts the same weights to $61.5\%$ and overtakes the single-component
+ablation of the reference system~\cite{sharp}.
 
-The practical value of the extension is that it recovers domain robustness
-\emph{on the learning side}, with a lightweight encoder, no extra
-signal-processing, and a frozen, reusable feature space. Since its residual
-errors are \emph{activity} confusions rather than \emph{domain} shift, the
-contrastive encoder is complementary to SHARP's antenna fusion: the clearest next
-step is to combine the two---keeping the frozen encoder---ideally with a
-sliding-window dataset and multi-seed runs.
+The two effective remedies act on different axes and cost almost nothing: the
+contrastive encoder recovers domain robustness on the learning side and yields a
+frozen, reusable feature space, while fusion recovers accuracy on the decision
+side from receiver diversity the dataset already contains. Combining
+them---fusion on top of the frozen probe, with the sliding-window front-end---is
+the immediate next step, together with multi-seed runs and the strongest-path
+sanitization that still separates us from the full reference pipeline.
 
 \paragraph{What we learned and difficulties encountered}
-The main lesson was that a strict, environment-based split changes the story:
-modest-looking numbers ($\sim\!50\%$) are the honest cost of never seeing the
-test environment, which a random split would have hidden. The t-SNE proved
-valuable as a diagnostic---it revealed that contrastive learning had solved the
-\emph{domain} axis but not the \emph{activity} axis. The main difficulties were:
-(i) getting SupCon pre-training to converge (the loss barely moved), so the
-representation is useful but under-trained; (ii) the counter-intuitive finding
-that end-to-end fine-tuning \emph{hurt} generalization by re-overfitting the
-single environment, which taught us to trust the frozen-encoder / linear-probe
-evaluation; and (iii) the high run-to-run variance of the small baseline, which
-makes single-run comparisons fragile and calls for multi-seed averaging.
+The strict environment-based split changes the story: modest-looking numbers
+($\sim\!50\%$) are the honest cost of never seeing the test environment, which a
+random split would have hidden. Two results were counter-intuitive---training
+\emph{less} well generalized \emph{better}, and fine-tuning the contrastive
+encoder \emph{hurt} by re-overfitting the single environment, which taught us to
+trust the frozen-encoder protocol---and the largest gain came from the cheapest
+change, once the data pipeline carried a group identifier. The main difficulties
+were getting SupCon pre-training to converge (the loss barely moved), the
+run-to-run variance of a small model trained on one environment, and the memory
+cost of overlapping windows, which forced a pre-allocating data loader before the
+$91\%$-overlap front-end could run at all.
