@@ -44,22 +44,25 @@ are:
   \item \textbf{Contrastive representation (F.~Vezzani).} A deeper
   batch-normalized encoder pre-trained with a supervised-contrastive loss and
   domain-randomization augmentations, then evaluated with a linear probe on the
-  frozen features. It improves cross-domain accuracy on every set.
+  frozen features. It improves cross-domain accuracy on every set when training
+  data is scarce---and, as we show, stops helping once it is not.
   \item \textbf{Multi-antenna decision fusion.} A group identifier that survives
   the whole data pipeline recovers which windows are the \emph{same} physical
   time window seen by the four receiver antennas, so their predictions can be
-  fused by averaging class probabilities---the largest gain we measured, with no
-  retraining.
+  fused by averaging class probabilities: $+10$ to $+13$ points in both data
+  regimes, with no retraining.
   \item \textbf{Front-end and optimization engineering.} A sliding window with
   the stride used by the SHARP authors ($30$ samples, $91\%$ overlap) replaces
-  the na\"ive non-overlapping segmentation, supported by a two-pass,
-  memory-bounded dataset builder; and a controlled comparison of learning-rate
-  and early-stopping settings shows that, with a single training environment,
-  fitting the training set better does \emph{not} imply generalizing better.
+  the na\"ive non-overlapping segmentation---worth $+11.1$ points on its own, and
+  affordable only through a two-pass, memory-bounded dataset builder; and a
+  controlled comparison of learning-rate and early-stopping settings shows that,
+  with a single training environment, fitting the training set better does
+  \emph{not} imply generalizing better.
 \end{itemize}
-We use the full SHARP system~\cite{sharp} as the reference upper bound and
-discuss, quantitatively, which part of the gap each strategy removes and which
-part is left.
+Combining the last two takes the same architecture from $48.2\%$ to
+$\mathbf{72.1\%}$. We use the full SHARP system~\cite{sharp} as the reference
+upper bound and discuss, quantitatively, which part of the gap each strategy
+removes and which part is left.
 
 \secref{sec:related_work} reviews the related work;
 \secref{sec:processing_architecture} gives a high-level view of the pipeline and

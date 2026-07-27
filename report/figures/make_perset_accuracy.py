@@ -1,10 +1,10 @@
 """Per-measurement-set cross-domain accuracy across the notebook iterations.
 
 All numbers are read off the stored outputs of the shipped notebooks:
-  single-antenna baseline, Adam lr 1e-3, patience 7   (fast schedule)
-  SupCon frozen encoder + linear probe
-  single-antenna baseline, Adam lr 1e-4, patience 5   (slow schedule)
-  same slow-schedule model, 4-antenna soft decision fusion
+  baseline, non-overlapping windows (stride 340)
+  SupCon frozen encoder + linear probe, same windows
+  baseline, sliding window (stride 30)
+  same sliding-window model, 4-antenna soft decision fusion
 """
 import matplotlib
 matplotlib.use("Agg")
@@ -14,10 +14,10 @@ import numpy as np
 SETS = ["S2", "S3", "S4", "S5", "S6", "S7", "Overall"]
 
 SERIES = [
-    ("baseline, fast sched.",   [45.5, 51.4, 48.5, 47.5, 48.1, 52.3, 48.2], "#0072B2"),
-    ("SupCon linear probe",     [51.1, 59.7, 51.9, 52.9, 51.3, 58.2, 53.1], "#009E73"),
-    ("baseline, slow sched.",   [50.9, 55.9, 50.6, 49.8, 50.6, 51.5, 51.3], "#D55E00"),
-    ("+ 4-antenna fusion",      [62.6, 68.8, 58.1, 57.5, 57.9, 68.9, 61.5], "#8C6BB1"),
+    ("baseline, non-overlapping", [45.5, 51.4, 48.5, 47.5, 48.1, 52.3, 48.2], "#0072B2"),
+    ("+ SupCon linear probe",     [51.1, 59.7, 51.9, 52.9, 51.3, 58.2, 53.1], "#009E73"),
+    ("baseline, sliding window",  [60.8, 61.6, 56.9, 57.4, 57.4, 64.0, 59.3], "#D55E00"),
+    ("+ 4-antenna fusion",        [77.9, 75.2, 66.2, 66.0, 72.7, 70.9, 72.1], "#8C6BB1"),
 ]
 
 plt.rcParams.update({
@@ -44,7 +44,7 @@ ax.axvline((x[-2] + x[-1]) / 2, color="#CCCCCC", lw=0.6, zorder=1)
 ax.axhline(20, color="#999999", lw=0.6, ls=(0, (3, 3)), zorder=2)
 
 ax.set_ylabel("cross-domain accuracy [\\%]" if False else "cross-domain accuracy [%]")
-ax.set_ylim(0, 80)
+ax.set_ylim(0, 90)
 ax.set_yticks([0, 20, 40, 60, 80])
 ax.set_xticks(x)
 ax.set_xticklabels(SETS)

@@ -34,19 +34,21 @@ strategy, a \emph{group-aware} pipeline enabling \emph{decision fusion}, a
 \emph{contrastive} representation, and a different \emph{optimizer schedule}.
 Only the first touches the data loader and only the third trains a new network;
 fusion is post-processing on an unchanged model, which is what makes its measured
-gain remarkable.
+gain remarkable. The two largest gains---the sliding window and fusion---compose,
+and their combination is our best configuration.
 
 \begin{table}[t]
   \centering
-  \caption{The modifications evaluated, the code each required, and the resulting
-  cross-domain accuracy (train on $S1$, test on $S2$--$S7$, one run). Each is
-  measured against the reference configuration of the first row.}
+  \caption{The modifications evaluated, the code each required, and their effect
+  on cross-domain accuracy (train on $S1$, test on $S2$--$S7$, one run each).
+  Each is measured against the reference configuration of the first row, or
+  against the same configuration with a sliding front-end.}
   \label{tab:versions}
   \setlength{\tabcolsep}{3pt}
   \footnotesize
-  \begin{tabular}{@{}lp{0.50\columnwidth}r@{}}
+  \begin{tabular}{@{}lp{0.47\columnwidth}r@{}}
     \toprule
-    Strategy & Implementation & Acc.\\
+    Strategy & Implementation & Effect\\
     \midrule
     \emph{Reference} &
       non-overlapping windows (stride $340$, $13{,}564$ windows);
@@ -55,18 +57,18 @@ gain remarkable.
     Contrastive &
       augmentations $+$ BN encoder with global average pooling $+$ SupCon loss;
       linear probe on the frozen encoder
-      & $53.1\%$\\[2pt]
+      & $+4.9$ \newline ($-1.0$ sliding)\\[2pt]
     Slow schedule &
       Adam $10^{-4}$, patience $5$, budget $100$; nothing else changes
-      & $51.3\%$\\[2pt]
+      & $+3.1$\\[2pt]
+    Sliding window &
+      stride $30$ ($91\%$ overlap, $152{,}320$ windows); two-pass
+      pre-allocating loader, splits built separately; patience raised to $12$
+      & $+11.1$\\[2pt]
     Antenna fusion &
       group id emitted by the loader and carried through the split; softmax and
       per-group probability average at inference, same weights
-      & $\mathbf{61.5\%}$\\[2pt]
-    Sliding window &
-      stride $30$ ($91\%$ overlap, $\approx\!10\times$ windows); two-pass
-      pre-allocating loader, splits built separately
-      & pending\\
+      & $\mathbf{+12.8}$ \newline ($+10.2$ non-ov.)\\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -145,7 +147,7 @@ any pattern straddling a boundary is cut in half. It gives $13{,}564$ windows,
 reasonably balanced (E:~$3012$, J:~$2160$, L:~$3056$, R:~$2684$, W:~$2652$). The
 alternative is a sliding window: after prototyping $S=170$ ($50\%$ overlap) we
 adopted $S=30$, the value hard-coded in the SHARP authors' own dataset script,
-i.e.\ $91\%$ overlap and $\approx\!10\times$ as many windows from the same
+i.e.\ $91\%$ overlap and $152{,}320$ windows---$11\times$ as many, from the same
 recordings. Overlapping windows are strongly correlated, so the number of
 \emph{independent} examples grows far less than tenfold, and a window and its
 neighbour can land on opposite sides of the random train/val split, making the
@@ -161,8 +163,9 @@ window seen by different antennas, which is what makes \secref{sec:fusion}
 possible. The id is carried through the split alongside the labels, and the test
 \texttt{DataLoader} uses \texttt{shuffle=False} to stay aligned with it.
 
-\textbf{A memory-bounded loader.} At $S=30$ the windows no longer fit
-comfortably in a Colab runtime: the original loader accumulated per-file arrays
+\textbf{A memory-bounded loader.} At $S=30$ the windows ($4.98$\,GB of
+train/val and $15.74$\,GB of test data) no longer fit comfortably in a Colab
+runtime: the original loader accumulated per-file arrays
 in a list and called \texttt{np.concatenate}, holding list \emph{and} result in
 RAM at once---affordable at $1.8$\,GB, not at $\approx\!20$\,GB. The rewritten
 loader makes two passes: the first counts the windows each trace will produce,
@@ -178,10 +181,10 @@ folders of $S1$ ($S1a,S1b,S1c$) are used for training/validation and every other
 set is held out for testing; a random split would leak windows from the same
 person/room/day into both train and test and overestimate performance. Within
 $S1$ we keep $85\%$ for training and $15\%$ for validation (stratified),
-giving $2767$ / $489$ / $10{,}308$ windows for train / val / test at $S=340$;
-the $10{,}308$ test windows collapse to $2577$ distinct physical time windows
-once the four antennas are grouped, which is the number of decisions the fused
-evaluation reports.
+giving $2767$ / $489$ / $10{,}308$ windows for train / val / test at $S=340$ and
+$31{,}103$ / $5489$ / $115{,}728$ at $S=30$. Grouping the four antennas collapses
+the test windows to $2577$ and $28{,}932$ distinct physical time windows
+respectively---the number of decisions the fused evaluation reports.
 
 \section{Learning Framework}
 \label{sec:learning_framework}
@@ -245,53 +248,42 @@ parameters---exactly the count reported for the SHARP baseline CNN~\cite{sharp}.
 Training uses cross-entropy, Adam, mini-batches of $64$ and \emph{early
 stopping}, restoring the lowest-validation-loss weights before testing.
 
-\textbf{Two optimizer schedules} were compared with everything else held fixed
-(\tab{tab:schedule}), because their effect is counter-intuitive. The \emph{fast}
-schedule ($\text{lr}=10^{-3}$, patience~$7$) stops at epoch~$13$ (best validation
-loss $0.993$) with the classic overfitting signature of \fig{fig:curves}(a):
-training accuracy climbs to $0.60$ while validation accuracy plateaus near
-$0.52$. The \emph{slow} schedule ($\text{lr}=10^{-4}$, patience~$5$, budget
-$100$) runs for $41$ epochs with the two curves almost on top of each other
-(\fig{fig:curves}(b)) and stops at a training accuracy of only $\approx\!0.58$:
-the model has not yet fitted its own training set. Reading that as underfitting,
-the final configuration keeps $\text{lr}=10^{-3}$ but raises patience to $12$, so
-a plateau no longer ends training prematurely---which matters at stride~$30$,
-where each epoch is an order of magnitude slower.
-
-\begin{table}[t]
-  \centering
-  \caption{The optimizer schedules compared; everything else (architecture, data,
-  seed, batch size, split) is held fixed. ``Stop'' is the epoch early stopping
-  fired at, in parentheses the epoch whose weights were restored.}
-  \label{tab:schedule}
-  \setlength{\tabcolsep}{4pt}
-  \small
-  \begin{tabular}{@{}lccccc@{}}
-    \toprule
-    Schedule & lr & patience & budget & stop (best) & train acc.\\
-    \midrule
-    fast     & $10^{-3}$ & $7$  & $40$  & $13$ ($6$)  & $0.601$\\
-    slow     & $10^{-4}$ & $5$  & $100$ & $41$ ($36$) & $0.575$\\
-    adopted  & $10^{-3}$ & $12$ & $100$ & --- & ---\\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\textbf{Three optimizer schedules} were compared with architecture, seed, batch
+size and split held fixed, because their effect is counter-intuitive
+(\fig{fig:curves}). The \emph{fast} schedule ($\text{lr}=10^{-3}$, patience~$7$,
+budget $40$) stops at epoch~$13$ (best validation loss $0.993$) with the classic
+overfitting signature: training accuracy climbs to $0.601$ while validation
+accuracy plateaus near $0.52$. The \emph{slow} schedule ($10^{-4}$,
+patience~$5$, budget $100$) runs for $41$ epochs with the two curves almost on
+top of each other and stops at a training accuracy of only $0.575$: the model has
+not yet fitted its own training set. Reading that as underfitting, the
+\emph{adopted} schedule keeps $10^{-3}$ but raises patience to $12$, so a plateau
+no longer ends training prematurely---which matters at stride~$30$, where each
+epoch is an order of magnitude slower; on that data it reaches $0.756$ training
+accuracy and stops at epoch~$27$.
 
 \begin{figure}[t]
   \centering
-  \begin{subfigure}{0.49\columnwidth}
+  \begin{subfigure}{0.32\columnwidth}
     \includegraphics[width=\textwidth]{acc_fast.png}
-    \caption{fast: $10^{-3}$, pat.\ $7$}
+    \caption{fast, non-ov.}
   \end{subfigure}\hfill
-  \begin{subfigure}{0.49\columnwidth}
+  \begin{subfigure}{0.32\columnwidth}
     \includegraphics[width=\textwidth]{acc_slow.png}
-    \caption{slow: $10^{-4}$, pat.\ $5$}
+    \caption{slow, non-ov.}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.32\columnwidth}
+    \includegraphics[width=\textwidth]{acc_slide.png}
+    \caption{adopted, sliding}
   \end{subfigure}
-  \caption{Baseline train/validation accuracy under the two optimizer schedules.
-  In (a) the training curve detaches from the validation one after $\approx\!6$
-  epochs (overfitting the single environment); in (b) the two stay glued together
-  and stop at a training accuracy of $0.575$---\emph{under}-fitted, and yet
-  generalizing better (\tab{tab:compare}).}
+  \caption{Baseline train/validation accuracy under the three schedules:
+  (a) $10^{-3}$/patience~$7$, (b) $10^{-4}$/patience~$5$, both on non-overlapping
+  windows, and (c) $10^{-3}$/patience~$12$ on sliding windows. In (a) the training
+  curve detaches from the validation one after $\approx\!6$ epochs (overfitting
+  the single environment); in (b) the two stay glued together and stop
+  \emph{under}-fitted at $0.575$, and yet generalize better; in (c) the denser
+  windows let the model reach $0.756$ with validation accuracy $12$ points above
+  (a).}
   \label{fig:curves}
 \end{figure}
 
@@ -313,9 +305,8 @@ classifier is then fit on the frozen representation (\emph{linear probe}).
 
 \subsubsection{Domain-randomization augmentations}
 SupCon needs, for each window, two augmented ``views'' that keep the activity
-intact but perturb nuisance factors, acting as a light domain randomization
-(\fig{fig:aug}). All transforms run on-GPU on a whole batch (default
-parameters in parentheses):
+intact but perturb nuisance factors, acting as a light domain randomization. All
+transforms run on-GPU on a whole batch (default parameters in parentheses):
 \begin{itemize}
   \item \textbf{amplitude scaling} by a per-window random gain
   ($\mathcal{U}(0.8,1.2)$)---rooms/distances reflect the signal with different
@@ -330,23 +321,12 @@ parameters in parentheses):
 
 \begin{figure}[t]
   \centering
-  \begin{subfigure}{\columnwidth}
-    \includegraphics[width=\textwidth]{doppler_activities.png}
-    \caption{one input window per activity}
-    \label{fig:activities}
-  \end{subfigure}\\[2pt]
-  \begin{subfigure}{\columnwidth}
-    \includegraphics[width=\textwidth]{augment_views.png}
-    \caption{a window and two augmented views}
-    \label{fig:aug}
-  \end{subfigure}
-  \caption{(a) One Doppler-spectrogram window per activity (transposed: rows are
-  the $100$ velocity bins, columns the $340$ time samples); low-motion classes
+  \includegraphics[width=\columnwidth]{doppler_activities.png}
+  \caption{One Doppler-spectrogram window per activity (transposed: rows are the
+  $100$ velocity bins, columns the $340$ time samples). Low-motion classes
   concentrate energy at zero velocity, \emph{running}/\emph{jumping} spread it
-  widely. (b) Scaling and noise change the texture and the circular shift and
-  SpecAugment-style masks (dark bands) hide parts of the pattern, while the
-  activity signature survives.}
-  \label{fig:data}
+  widely.}
+  \label{fig:activities}
 \end{figure}
 
 \subsubsection{Encoder and projection head}

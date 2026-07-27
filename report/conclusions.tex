@@ -4,30 +4,33 @@
 \label{sec:conclusions}
 
 Starting from a baseline Wi-Fi HAR pipeline evaluated under a strict cross-domain
-protocol ($48.2\%$ on unseen environments), we implemented and measured three
-strategies one at a time: a supervised-contrastive representation ($53.1\%$,
-better on every measurement set, with a t-SNE confirming environment-invariance),
-a slower optimizer schedule ($51.3\%$), and multi-antenna soft decision fusion,
-which lifts the same weights to $61.5\%$ and overtakes the single-component
-ablation of the reference system~\cite{sharp}.
+protocol ($48.2\%$ on unseen environments), we implemented and measured four
+strategies one at a time: a supervised-contrastive representation ($+4.9$ points,
+with a t-SNE confirming environment-invariance), a slower optimizer schedule
+($+3.1$), an overlapping sliding window ($+11.1$) and multi-antenna soft decision
+fusion ($+12.8$). The last two compose and take the \emph{same}
+$128{,}535$-parameter network to $\mathbf{72.1\%}$, above the single-component
+ablation of the reference system~\cite{sharp} on every unseen set.
 
-The two effective remedies act on different axes and cost almost nothing: the
-contrastive encoder recovers domain robustness on the learning side and yields a
-frozen, reusable feature space, while fusion recovers accuracy on the decision
-side from receiver diversity the dataset already contains. Combining
-them---fusion on top of the frozen probe, with the sliding-window front-end---is
-the immediate next step, together with multi-seed runs and the strongest-path
-sanitization that still separates us from the full reference pipeline.
+Two of them cost almost nothing at training time---a stride constant and a
+probability average over receiver diversity the dataset already contains---which
+makes them the first things to try in a new deployment. The contrastive encoder
+is the conditional case: it clearly helps when labelled windows are scarce and
+stops helping once the front-end supplies ten times more of them, so we read it
+as a data-efficiency mechanism rather than a substitute for a good front-end.
+Still missing are the strongest-path phase sanitization that accounts for most of
+the remaining gap, multi-seed runs to put error bars on differences of a few
+points, and the one combination we did not run: fusion on top of the frozen
+contrastive probe.
 
 \paragraph{What we learned and difficulties encountered}
-The strict environment-based split changes the story: modest-looking numbers
-($\sim\!50\%$) are the honest cost of never seeing the test environment, which a
-random split would have hidden. Two results were counter-intuitive---training
-\emph{less} well generalized \emph{better}, and fine-tuning the contrastive
-encoder \emph{hurt} by re-overfitting the single environment, which taught us to
-trust the frozen-encoder protocol---and the largest gain came from the cheapest
-change, once the data pipeline carried a group identifier. The main difficulties
-were getting SupCon pre-training to converge (the loss barely moved), the
-run-to-run variance of a small model trained on one environment, and the memory
-cost of overlapping windows, which forced a pre-allocating data loader before the
-$91\%$-overlap front-end could run at all.
+The strict environment-based split changes the story: modest-looking numbers are
+the honest cost of never seeing the test environment, which a random split would
+have hidden. Three results were counter-intuitive---training \emph{less} well
+generalized \emph{better}; fine-tuning the contrastive encoder \emph{hurt} by
+re-overfitting the single environment; and the largest gains came from the two
+cheapest changes, once the data pipeline carried a group identifier. The main
+difficulties were getting SupCon pre-training to converge (the loss barely
+moved), the run-to-run variance of a small model trained on one environment, and
+the memory cost of overlapping windows, which forced a two-pass, pre-allocating
+loader before the $91\%$-overlap front-end could run at all.
