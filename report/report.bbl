@@ -1,0 +1,25 @@
+\begin{thebibliography}{1}
+
+\bibitem{sharp}
+F.~Meneghello, D.~Garlisi, N.~D. Fabbro, I.~Tinnirello, and M.~Rossi, ``{SHARP:
+  Environment and Person Independent Activity Recognition With Commodity IEEE
+  802.11 Access Points},'' {\em {IEEE Transactions on Mobile Computing}},
+  vol.~22, pp.~6160--6175, Oct. 2023.
+
+\bibitem{csidataset}
+F.~Meneghello, N.~D. Fabbro, D.~Garlisi, I.~Tinnirello, and M.~Rossi, ``{A CSI
+  Dataset for Wireless Human Sensing on 80 MHz Wi-Fi Channels},'' {\em {IEEE
+  Communications Magazine}}, vol.~61, pp.~146--152, Sept. 2023.
+
+\bibitem{supcon}
+P.~Khosla, P.~Teterwak, C.~Wang, A.~Sarna, Y.~Tian, P.~Isola, A.~Maschinot,
+  C.~Liu, and D.~Krishnan, ``{Supervised Contrastive Learning},'' in {\em
+  {Advances in Neural Information Processing Systems (NeurIPS)}},
+  pp.~18661--18673, Dec. 2020.
+
+\bibitem{simclr}
+T.~Chen, S.~Kornblith, M.~Norouzi, and G.~Hinton, ``{A Simple Framework for
+  Contrastive Learning of Visual Representations},'' in {\em {International
+  Conference on Machine Learning (ICML)}}, pp.~1597--1607, July 2020.
+
+\end{thebibliography}
