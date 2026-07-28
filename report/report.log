@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.11.29)  27 JUL 2026 23:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.11.29)  28 JUL 2026 23:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -711,11 +711,6 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 73.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (./intro.tex
-Underfull \hbox (badness 3590) in paragraph at lines 34--37
-\OT1/ptm/m/n/10 ple-men-ta-tion of the dataset pipeline and base-line
- []
-
-
 Underfull \hbox (badness 3417) in paragraph at lines 37--42
 \OT1/ptm/m/n/10 normalized en-coder pre-trained with a supervised-
  []
@@ -774,41 +769,41 @@ ut line 148.
 File: ./figures/confusion_overall_c.png Graphic file (type png)
 <use ./figures/confusion_overall_c.png>
 Package pdftex.def Info: ./figures/confusion_overall_c.png  used on input line 
-77.
+76.
 (pdftex.def)             Requested size: 126.41748pt x 102.75833pt.
 <./figures/cl_confusion_c.png, id=40, 498.86375pt x 405.515pt>
 File: ./figures/cl_confusion_c.png Graphic file (type png)
 <use ./figures/cl_confusion_c.png>
-Package pdftex.def Info: ./figures/cl_confusion_c.png  used on input line 81.
+Package pdftex.def Info: ./figures/cl_confusion_c.png  used on input line 80.
 (pdftex.def)             Requested size: 126.41748pt x 102.75833pt.
 <./figures/confusion_v4_single_c.png, id=41, 508.90125pt x 401.5pt>
 File: ./figures/confusion_v4_single_c.png Graphic file (type png)
 <use ./figures/confusion_v4_single_c.png>
 Package pdftex.def Info: ./figures/confusion_v4_single_c.png  used on input lin
-e 85.
+e 84.
 (pdftex.def)             Requested size: 126.41748pt x 99.7376pt.
 <./figures/confusion_v4_fused_c.png, id=42, 508.90125pt x 401.5pt>
 File: ./figures/confusion_v4_fused_c.png Graphic file (type png)
 <use ./figures/confusion_v4_fused_c.png>
 Package pdftex.def Info: ./figures/confusion_v4_fused_c.png  used on input line
- 89.
+ 88.
 (pdftex.def)             Requested size: 126.41748pt x 99.7376pt.
 <./figures/tsne_slide.png, id=43, 931.5603pt x 354.123pt>
 File: ./figures/tsne_slide.png Graphic file (type png)
 <use ./figures/tsne_slide.png>
-Package pdftex.def Info: ./figures/tsne_slide.png  used on input line 102.
+Package pdftex.def Info: ./figures/tsne_slide.png  used on input line 101.
 (pdftex.def)             Requested size: 233.21715pt x 88.6548pt.
  [4]
 <./figures/training_curves_slide.png, id=51, 859.2903pt x 281.853pt>
 File: ./figures/training_curves_slide.png Graphic file (type png)
 <use ./figures/training_curves_slide.png>
 Package pdftex.def Info: ./figures/training_curves_slide.png  used on input lin
-e 136.
+e 134.
 (pdftex.def)             Requested size: 250.77312pt x 82.25566pt.
 <./figures/perset_accuracy.png, id=52, 247.8861pt x 110.75377pt>
 File: ./figures/perset_accuracy.png Graphic file (type png)
 <use ./figures/perset_accuracy.png>
-Package pdftex.def Info: ./figures/perset_accuracy.png  used on input line 164.
+Package pdftex.def Info: ./figures/perset_accuracy.png  used on input line 162.
 
 (pdftex.def)             Requested size: 250.77312pt x 112.048pt.
 
@@ -842,7 +837,7 @@ L3 programming layer <2024-01-22>
 Here is how much of TeX's memory you used:
  17004 strings out of 476182
  342100 string characters out of 5795594
- 1952975 words of memory out of 5000000
+ 1953975 words of memory out of 5000000
  38688 multiletter control sequences out of 15000+600000
  607827 words of font info for 149 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
@@ -870,7 +865,7 @@ ts/cm/cmtt8.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb
 ></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/t
 exlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-di
 st/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (6 pages, 679338 bytes).
+Output written on report.pdf (6 pages, 679180 bytes).
 PDF statistics:
  167 PDF objects out of 1000 (max. 8388607)
  94 compressed objects within 1 object stream
