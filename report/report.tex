@@ -75,16 +75,16 @@ email: \texttt{francesco.vezzani.1@studenti.unipd.it}, [Mat. 2159567]}
 %=============================================================================
 \begin{abstract}
 We study device-free human activity recognition (HAR) from the Doppler
-spectrograms of Wi-Fi channel-state information (CSI), using the publicly
+spectrograms of Wi-Fi channel-state information (CSI), using the
 released traces of the SHARP dataset~\cite{sharp,csidataset}. Starting from the
-Inception-style convolutional baseline of the course material, trained
+Inception-style convolutional baseline, trained
 only on measurement set~$S1$ and evaluated on the six unseen sets
 $S2$--$S7$. We add and measure, one change at a time, four strategies for
 closing the cross-domain gap without the hand-engineered front-end of the
 reference system: (i) supervised contrastive pre-training, with a linear probe
 on the frozen representation; (ii) a slower optimizer schedule; (iii) an
-overlapping sliding window at the stride used by the dataset authors, made
-affordable by a two-pass, memory-bounded loader; and (iv) multi-antenna soft
+overlapping sliding window at the stride used by the dataset authors and (iv) 
+multi-antenna soft
 decision fusion, averaging the per-antenna probability vectors of each
 physical time window with no retraining and no extra parameters. The last two
 compose into our best configuration, taking the same network from

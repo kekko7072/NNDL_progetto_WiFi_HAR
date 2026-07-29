@@ -5,9 +5,9 @@
 
 \textbf{Wi-Fi sensing and the SHARP system.}
 Device-free HAR from commodity Wi-Fi has matured rapidly thanks to CSI extraction
-tools and public datasets. The most relevant work for us is SHARP~\cite{sharp},
-which recognizes activities from the Doppler information in IEEE~802.11ac CSI and
-targets environment and person independence through two ingredients: (i) a robust phase-sanitization step that isolates the
+tools and public datasets. SHARP~\cite{sharp} recognizes activities from the 
+Doppler information in IEEE~802.11ac CSI and targets environment and person 
+independence through two ingredients: (i) a robust phase-sanitization step that isolates the
 multipath components and adopts the strongest path as phase reference, and
 (ii) a decision-fusion scheme that runs a compact Inception-style CNN on
 each of the four receiver antennas and combines their decisions. On the seven
@@ -28,7 +28,7 @@ more than any other change we made.
 Contrastive methods learn representations by pulling together ``views'' that
 should be similar and pushing apart those that should differ.
 SimCLR~\cite{simclr} established the self-supervised recipe of contrasting two
-augmented views against in-batch negatives with a temperature-scaled InfoNCE
+augmented views against in-batch negatives with a temperature-scaled
 loss on $L_2$-normalized embeddings. Supervised Contrastive Learning
 (SupCon)~\cite{supcon} extends it to
 the labelled setting (all samples sharing the anchor's label become

@@ -4,11 +4,11 @@
 \label{sec:processing_architecture}
 
 All of our models cast Wi-Fi HAR as the classification of Doppler-spectrogram
-images and share the same data front-end; they differ in how the
+images and share the same data front-end. They differ in how the
 representation is learned and in how the per-window decisions are
 combined. The raw CSI Doppler traces are cut into fixed-size
-windows of shape $1\times340\times100$, one antenna at a time
-(\secref{sec:model}); from there the pipeline forks:
+windows of shape $1\times340\times100$, one antenna at a time.
+From there the pipeline forks:
 \begin{itemize}
   \item the \textbf{baseline chain} feeds each window to an
   Inception-style CNN trained end-to-end with cross-entropy, and reads the
@@ -23,8 +23,8 @@ windows of shape $1\times340\times100$, one antenna at a time
 \end{itemize}
 All chains are trained on a single environment ($S1$) and evaluated under the
 same cross-domain protocol (unseen $S2$--$S7$), so they can be compared on equal
-footing against the reference SHARP system~\cite{sharp};
-\secref{sec:learning_framework} details them.
+footing against the reference SHARP system~\cite{sharp} 
+(\secref{sec:learning_framework} details them).
 
 \subsection{The changes we evaluate}
 \label{sec:versions}
@@ -32,7 +32,7 @@ Four modifications were implemented on that skeleton, each isolated so that its
 effect is attributable (\tab{tab:versions}): a windowing strategy, a
 group-aware pipeline enabling decision fusion, a contrastive
 representation and an optimizer schedule. Only the first touches the data
-loader and only the third trains a new network; fusion is post-processing on an
+loader and only the third trains a new network. Fusion is post-processing on an
 unchanged model, which is what makes its gain remarkable. The sliding window and 
 fusion compose into our best configuration.
 
@@ -82,8 +82,8 @@ dataset~\cite{csidataset} (IEEE~802.11ac, $80$\,MHz): arrays of shape $(T,100)$
 ($T$ time steps, $100$ Doppler-velocity bins) one per receiving antenna
 (\texttt{stream\_1}\dots\texttt{stream\_4}) of a four-antenna monitor. They map to
 seven measurement sets $S1$--$S7$, each a distinct (environment, monitor
-position, person, day) combination. Only $S1$ is used for training; the others
-probe generalization to an unseen day ($S2$), an unseen person ($S3$), blocked
+position, person, day) combination. Only $S1$ is used for training, instead the others
+explore generalization to an unseen day ($S2$), an unseen person ($S3$), blocked
 line-of-sight ($S4$, $S5$), a different room ($S6$), and new room, day and person
 at once ($S7$).
 
@@ -92,23 +92,22 @@ We use the five core activities present in every environment: \textbf{E} (empty
 room), \textbf{J} (jumping), \textbf{L} (sitting still), \textbf{R} (running),
 \textbf{W} (walking), matching the five-class task of~\cite{sharp}. Each trace
 is cut into windows of $W_{\text{len}}=340$ time samples ($\approx 2$\,s)
-advancing by a stride $S$, plus a channel dimension: inputs of shape
+advancing by a stride $S$, plus a channel dimension with inputs of shape
 $1\times340\times100$. Each antenna stream is an independent labelled sample, as
-SHARP does at training time; antenna identity is re-used only at decision
+SHARP does at training time. The antenna identity is re-used only at decision
 time (\secref{sec:fusion}).
 
 \textbf{Windowing strategy.} The reference configuration uses
 $S=W_{\text{len}}=340$, i.e.\ non-overlapping windows: simplest, but
 wasteful. A trace of length $T$ yields only $\lfloor T/340\rfloor$ examples and
-any pattern straddling a boundary is cut in half. It gives $13{,}564$ windows
-(E:~$3012$, J:~$2160$, L:~$3056$, R:~$2684$, W:~$2652$). The alternative is a
+any pattern straddling a boundary is cut in half. The alternative is a
 sliding window: after prototyping $S=170$ we adopted $S=30$, the value hard-coded
 in the SHARP authors' own dataset script, $91\%$ overlap and $152{,}320$ windows
 from the same recordings. They are strongly correlated, so the number of
 independent examples grows far less than tenfold, and a window and its
 neighbour can fall on opposite sides of the random train/val split, making the
-validation loss optimistic and perturbing when early stopping fires; the
-test figures are unaffected, the test environments being disjoint.
+validation loss optimistic and perturbing when early stopping fires. The
+test figures are unaffected.
 
 \textbf{Group identifiers.} The four streams of a recording have identical
 length, so window~$k$ of each starts at sample $kS$ of the same event. The parser
@@ -119,8 +118,8 @@ which is what makes \secref{sec:fusion} possible. The id travels through the
 split with the labels, and the test \texttt{DataLoader} uses
 \texttt{shuffle=False} to stay aligned with it.
 
-\textbf{A memory-bounded loader.} At $S=30$ the windows ($4.98$\,GB train/val,
-$15.74$\,GB test) no longer fit comfortably in a Colab runtime. The rewritten 
+\textbf{A memory-bounded loader.} At $S=30$ the windows no longer fit comfortably 
+in a Colab runtime. The rewritten 
 loader makes two passes: the first counts the windows
 each trace will produce, the second fills one pre-allocated \texttt{float32}
 array and frees each trace as soon as it is windowed, loading train/val and
@@ -129,13 +128,13 @@ copy explicitly. Peak memory is roughly halved and the windows are identical.
 
 \subsection{Cross-domain split}
 Following the SHARP protocol the split is by environment, never random: $S1$
-($S1a,S1b,S1c$) is used for training/validation and every other set is held out;
-a random split would leak windows from the same person/room/day into both sides
+($S1a,S1b,S1c$) is used for training/validation and every other set is held out.
+A random split would leak windows from the same person/room/day into both sides
 and overestimate performance. Within $S1$ we keep $85\%$ for training and $15\%$
-for validation (stratified), $2767$ / $489$ / $10{,}308$ windows for train / val / test at $S=340$ and
+for validation, $2767$ / $489$ / $10{,}308$ windows for train / val / test at $S=340$ and
 $31{,}103$ / $5489$ / $115{,}728$ at $S=30$. Grouping the four antennas collapses
 the test windows to $2577$ and $28{,}932$ distinct physical time windows
-respectively, the number of decisions the fused evaluation reports.
+respectively.
 
 \section{Learning Framework}
 \label{sec:learning_framework}

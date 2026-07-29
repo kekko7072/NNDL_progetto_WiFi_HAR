@@ -24,14 +24,14 @@ fusion, at the cost of a heavy, hand-engineered pipeline~\cite{sharp}.
 We tackle five-class Wi-Fi HAR under a strict cross-domain protocol (train on
 one environment, test on six unseen ones) and ask how much of the gap can be
 closed without that front-end: by learning invariance with
-Supervised Contrastive Learning (SupCon)~\cite{supcon} instead of engineering it,
+Supervised Contrastive Learning (SupCon)~\cite{supcon},
 by re-using the receiver diversity the dataset already provides, and by feeding
 the network more of the signal it already has. Every change is implemented and
 measured one at a time, on the same baseline and protocol, so each
 accuracy figure is attributable to one design decision (\tab{tab:versions}). The
 contributions are:
 \begin{itemize}
-  \item \textbf{Baseline (M.~Carraro).} A plain-PyTorch reimplementation
+  \item \textbf{Baseline (M.~Carraro).} A plain reimplementation
   of the dataset pipeline and baseline Inception-style CNN, with a cross-domain
   protocol (train on $S1$, test on $S2$--$S7$) and a per-set error breakdown.
   \item \textbf{Contrastive representation (F.~Vezzani).} A batch-normalized
@@ -39,14 +39,14 @@ contributions are:
   augmentations, evaluated with a linear probe on the frozen features: it
   improves every set when training data is scarce, and stops helping once it is
   not.
-  \item \textbf{Multi-antenna decision fusion.} A group identifier threaded
-  through the pipeline recovers which windows are the same physical time
+  \item \textbf{Multi-antenna decision fusion (M.~Carraro).} A group identifier 
+  recovers which windows are the same physical time
   window seen by the four antennas, so their predictions can be fused by
   averaging class probabilities.
   \item \textbf{Front-end and optimization engineering.} A sliding window at the
   stride used by the SHARP authors ($30$ samples, $91\%$ overlap) replaces the
-  na\"ive segmentation, affordable only through a two-pass, memory-bounded 
-  dataset builder; a controlled comparison of optimizer
+  naive segmentation, affordable only through a two-pass, memory-bounded 
+  dataset builder. A controlled comparison of optimizer
   schedules shows that, with a single training environment, fitting the training
   set better does not imply generalizing better.
 \end{itemize}
@@ -55,9 +55,9 @@ $\mathbf{72.7\%}$. We use the full SHARP system~\cite{sharp} as the reference
 upper bound and discuss, quantitatively, which part of the gap each strategy
 removes and which part is left.
 
-\secref{sec:related_work} reviews the related work;
+\secref{sec:related_work} reviews the related work.
 \secref{sec:processing_architecture} gives a high-level view of the pipeline and
-of the changes we evaluate; \secref{sec:model} details signals and features and
+of the changes we evaluate. \secref{sec:model} details signals and features and
 \secref{sec:learning_framework} the learning frameworks. Results and the
 comparison against SHARP are in \secref{sec:results}, concluding remarks in
 \secref{sec:conclusions}.
