@@ -147,7 +147,7 @@ respectively.
   \includegraphics[width=\columnwidth]{SHARP_architecture_baseline.png}
   \caption{Baseline single-antenna architecture of
   SHARP reduced-Inception module~(\cite{sharp}, Fig.~4). \texttt{S2} denotes
-  stride~2; every CONV is followed by a ReLU ($128{,}535$ parameters).}
+  stride~2; every CONV is followed by a ReLU.}
   \label{fig:baseline_arch}
 \end{figure}
 
@@ -157,11 +157,11 @@ strided conv, three stacked convs) turn the $1\times340\times100$ input into
 feature maps of identical size $170\times50$, concatenated on the channel axis
 ($1{+}5{+}9=15$), reduced to $3$ channels by a $1\times1$ convolution, flattened
 and classified by a dense layer after $\mathrm{Dropout}(0.2)$ leads to
-$\mathbf{128{,}535}$ parameters, exactly the count reported for the SHARP
+$128{,}535$ parameters, exactly the count reported for the SHARP
 baseline CNN. Training uses cross-entropy, Adam, mini-batches of $64$ and
 early stopping, restoring the lowest-validation-loss weights.
 
-\textbf{Three optimizer schedules} were compared with architecture, seed, batch
+Three optimizer schedules were compared with architecture, seed, batch
 size and split held fixed, because their effect is counter-intuitive. The
 fast schedule ($\text{lr}=10^{-3}$, patience~$7$,
 budget $40$) stops at epoch~$13$ (best validation loss $0.993$) with the classic
@@ -171,7 +171,7 @@ patience~$5$, budget $100$) runs for $41$ epochs with the two curves almost on
 top of each other and stops at a training accuracy of only $0.575$: the model has
 not yet fitted its own training set. Reading that as underfitting, the
 adopted schedule keeps $10^{-3}$ but raises patience to $12$: a plateau
-no longer ends training prematurely, which matters at stride~$30$, where each
+no longer ends training prematurely (\fig{fig:training_curves}), which matters at stride~$30$, where each
 epoch is an order of magnitude slower; on that data it reaches $0.750$ training
 accuracy and stops at epoch~$27$.
 
@@ -187,7 +187,7 @@ different activities pushed apart, whatever environment, person or antenna
 they come from; a linear classifier is then fit on the frozen representation
 (linear probe). Each window needs two augmented ``views'' that keep the
 activity intact but perturb nuisance factors, a light domain randomization. All
-transforms run on-GPU on a whole batch: \textbf{amplitude scaling}
+transforms run on a whole batch: \textbf{amplitude scaling}
 ($\mathcal{U}(0.8,1.2)$, mimicking rooms/distances at different signal
 strength), \textbf{additive Gaussian noise} ($\sigma=0.05$), \textbf{circular
 time shift} ($\pm40$ samples) and \textbf{time/Doppler masking}
@@ -200,7 +200,7 @@ plus (i) batch normalization after every convolution, (ii) a $1\times1$ reductio
 to $32$ channels, (iii) a second downsampling stage
 ($32\!\rightarrow\!64\!\rightarrow\!128$, output $128\times43\times13$) and
 (iv) global average pooling, which replaces the baseline's large
-\texttt{flatten}$\rightarrow$dense layer with a fixed $128$-d representation $h$
+flatten$\rightarrow$dense layer with a fixed $128$-d representation $h$
 that has fewer parameters and is more shift-robust. An MLP projection head
 $g(\cdot)$ ($128\!\rightarrow\!128\!\rightarrow\!128$, ReLU) maps $h$ to an
 $L_2$-normalized $\bm{z}=g(h)$; as prescribed by SupCon the loss is applied to
@@ -234,7 +234,7 @@ quality of the representation, while \textbf{fine-tuning} unfreezes
 everything at lr~$10^{-4}$. A t-SNE projection of the test embeddings, colored by
 activity and by environment, is the invariance diagnostic. The contrastive and
 probe learning rates were $10^{-3}$ on the non-overlapping data and $10^{-4}$ on
-the sliding-window data, a difference we return to in \secref{sec:results}.
+the sliding-window data.
 
 \subsection{Multi-antenna decision fusion}
 \label{sec:fusion}
@@ -243,19 +243,21 @@ far discard that structure. SHARP keeps the per-antenna training convention but
 fuses the four decisions at inference~\cite{sharp}; that step is reproduced here
 as pure post-processing. For a group id $g$, let $A_g$ be the (up to four)
 antenna windows carrying it and $\bm{p}_i=\mathrm{softmax}(f(\bm{x}_i))$ the class
-probabilities of window~$i$; the fused decision is
+probabilities of window~$i$. The fused decision is
+
 \begin{equation}
 \label{eq:fusion}
 \hat{y}_g=\argmax_{c\in\{1,\dots,5\}}\ \frac{1}{|A_g|}\sum_{i\in A_g} p_{i,c},
 \end{equation}
+
 i.e.\ a soft vote, preferred to majority voting on the hard labels because
 a confident antenna can outweigh two unsure ones and because it degrades
 gracefully when a recording provides fewer than four streams. The reference paper
 does not detail its own rule, so \eq{eq:fusion} is a standard instantiation
-rather than a byte-for-byte reproduction.
+rather than a reproduction.
 
 Two details make it correct: the group id must not encode the stream
 index, so the four antennas collide onto one key, and the evaluation
-\texttt{DataLoader} must not shuffle, or the probabilities stop lining up with
+\texttt{DataLoader} must not shuffle or the probabilities stop lining up with
 the stored ids. Fusion also changes the unit of evaluation: one decision
 per physical time window instead of one per antenna.

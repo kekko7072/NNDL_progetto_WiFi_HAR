@@ -18,7 +18,8 @@ strongest-path sanitization behind most of the remaining gap, multi-seed runs,
 and fusion on top of the frozen probe with the contrastive stage re-tuned at
 $10^{-3}$.
 
-\paragraph{What we learned and difficulties encountered}
+
+\emph{What we learned and difficulties encountered}.
 The strict environment-based split explains the modest numbers: never seeing
 the test environment is an honest cost a random split would hide. Three
 results were counter-intuitive: training less well generalized
@@ -27,4 +28,4 @@ largest gains came from the two cheapest changes once the pipeline carried a
 group identifier. The main difficulties were getting SupCon pre-training to
 converge (the loss barely moved), run-to-run variance on one environment, and
 the memory cost of overlapping windows, which forced a pre-allocating loader
-before the ($91\%$-)overlap front-end could run.
+before the overlap front-end could run.

@@ -54,7 +54,7 @@ $\mathbf{53.1\%}$ (validation $58.3\%$): $+4.9$ points and an improvement on
 every set, the largest on $S3$ ($+8.3$, unseen person) and $S7$ ($+5.9$).
 Its confusion matrix (\fig{fig:cm}\,(b)) sharpens running and softens
 $L\!\rightarrow\!E$ ($0.76\!\rightarrow\!0.52$). Fine-tuning then
-hurts, dropping to $48.4\%$: freezing the encoder is what generalizes,
+hurts, dropping to $48.4\%$: freezing the encoder is what generalizes instead
 fine-tuning re-overfits the one environment.
 
 The t-SNE projection (\fig{fig:tsne}, from the sliding-window run of
@@ -65,7 +65,7 @@ representation. Colored by activity (left) the space splits into a
 static region (empty, sitting) and a moving arc (jumping,
 running, walking), but the activities within each region
 stay partly entangled: contrastive learning removed the domain nuisance
-and exposed a harder, intrinsic limit:a single-antenna $\approx\!2$\,s window
+and exposed a harder, intrinsic limit: a single-antenna $\approx\!2$\,s window
 does not fully separate the activities, whichever way it is encoded.
 Consistently, in both runs the SupCon loss fell only from $\approx\!4.5$ to
 $\approx\!4.3$: the pre-training never fully converged.
@@ -88,7 +88,7 @@ $\approx\!4.3$: the pre-training never fully converged.
     \includegraphics[width=\textwidth]{confusion_v4_fused_c.png}
     \caption{$+$ $4$-antenna fusion}
   \end{subfigure}
-  \caption{Row-normalized confusion matrices on all unseen test environments,
+  \caption{Confusion matrices on all unseen test environments,
   along the four milestones. The contrastive representation (b) softens the
   $L\!\rightarrow\!E$ confusion of the baseline (a); the sliding window (c) lifts
   every class; fusion (d) repairs the low-motion pair itself, $L$ going from
@@ -123,7 +123,7 @@ Cutting the same recordings at stride $30$ instead of $340$ turns $13{,}564$
 windows into $152{,}320$ and takes the unchanged architecture from
 $48.2\%$ to $\mathbf{60.1\%}$ ($+11.9$ points, $+8.6$ to $+16.1$ per set). Two
 caveats: the run also raises patience from $7$ to $12$, so part of the gain
-belongs to the longer schedule, and the extra windows are correlated, so the
+belongs to the longer schedule, and the extra windows are correlated and the
 effective sample size grows far less than tenfold. The cost is
 $\approx\!21$\,GB resident and an epoch an order of magnitude slower but the denser windows
 buy real fitting capacity, not noise: $0.750$ training accuracy with validation
@@ -152,7 +152,7 @@ motion classes but left sitting$\rightarrow$empty untouched: with
 almost no motion the four antennas agreed on the same wrong answer. At stride
 $30$ the single-antenna model is already half-right on that pair
 (\fig{fig:cm}\,(c), $L$ at $0.49$) and fusion turns it into the largest per-class
-gain: $L$ reaches $0.71$, $L\!\rightarrow\!E$ falls from $0.46$ to $0.27$---next
+gain: $L$ reaches $0.71$, $L\!\rightarrow\!E$ falls from $0.46$ to $0.27$ next
 to jumping ($0.57\!\rightarrow\!0.73$) and running
 ($0.65\!\rightarrow\!0.80$). Averaging helps only where antennas disagree, and
 denser coverage is what creates that disagreement on low-motion windows.
@@ -210,5 +210,5 @@ The SupCon stage attacks domain shift on the representation axis and, as
 the t-SNE shows, succeeds but its advantage evaporates once the front-end
 supplies ten times more windows. It is therefore worth its complexity when
 labelled windows are scarce, the realistic setting for a deployment with one
-calibration environment; in the data-rich regime the effort is better spent on
+calibration environment whereas in the data-rich regime the effort is better spent on
 the front-end and the decision rule.
