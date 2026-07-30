@@ -4,8 +4,7 @@
 \label{sec:results}
 
 We train on $S1$ and test on the unseen $S2$--$S7$.
-\tab{tab:compare} collects them per set and \fig{fig:perset} plots the four
-milestones.
+\tab{tab:compare} reports the accuracy of each configuration per set.
 
 \begin{table*}[t]
   \centering
@@ -40,37 +39,7 @@ milestones.
   \end{tabular}
 \end{table*}
 
-\subsection{Baseline}
-On the pooled unseen test set the baseline reaches $\mathbf{48.2\%}$ (test loss
-$1.052$), from $45.5\%$ ($S2$) to $52.3\%$ ($S7$). Its confusion matrix
-(\fig{fig:cm}\,(a)) has two dominant error modes: sitting still is
-absorbed by empty ($L\!\rightarrow\!E$: $0.76$), both near-static and
-concentrated at zero Doppler velocity, and running/walking are
-heavily confused ($0.39$ and $0.28$).
-
-\subsection{Contrastive representation}
-The linear probe on the frozen SupCon encoder raises accuracy to
-$\mathbf{53.1\%}$ (validation $58.3\%$): $+4.9$ points and an improvement on
-every set, the largest on $S3$ ($+8.3$, unseen person) and $S7$ ($+5.9$).
-Its confusion matrix (\fig{fig:cm}\,(b)) sharpens running and softens
-$L\!\rightarrow\!E$ ($0.76\!\rightarrow\!0.52$). Fine-tuning then
-hurts, dropping to $48.4\%$: freezing the encoder is what generalizes instead
-fine-tuning re-overfits the one environment.
-
-The t-SNE projection (\fig{fig:tsne}, from the sliding-window run of
-\secref{sec:sliding}) is the most informative diagnostic. Colored by
-environment (right) the points are totally mixed; the
-SupCon objective did reach its design goal of an environment-invariant
-representation. Colored by activity (left) the space splits into a
-static region (empty, sitting) and a moving arc (jumping,
-running, walking), but the activities within each region
-stay partly entangled: contrastive learning removed the domain nuisance
-and exposed a harder, intrinsic limit: a single-antenna $\approx\!2$\,s window
-does not fully separate the activities, whichever way it is encoded.
-Consistently, in both runs the SupCon loss fell only from $\approx\!4.5$ to
-$\approx\!4.3$: the pre-training never fully converged.
-
-\begin{figure*}[t]
+\begin{figure*}[!t]
   \centering
   \begin{subfigure}{0.245\textwidth}
     \includegraphics[width=\textwidth]{confusion_overall_c.png}
@@ -96,6 +65,46 @@ $\approx\!4.3$: the pre-training never fully converged.
   \label{fig:cm}
 \end{figure*}
 
+\subsection{Baseline and optimizer schedule}
+On the pooled unseen test set the baseline reaches $\mathbf{48.2\%}$ (test loss
+$1.052$), from $45.5\%$ ($S2$) to $52.3\%$ ($S7$). Its confusion matrix
+(\fig{fig:cm}\,(a)) has two dominant error modes: sitting still is
+absorbed by empty ($L\!\rightarrow\!E$: $0.76$), both near-static and
+concentrated at zero Doppler velocity, and running/walking are
+heavily confused ($0.39$ and $0.28$).
+
+The slow schedule improves accuracy to $51.3\%$ ($+3.1$ points) even though
+training accuracy is lower ($0.575$ instead of $0.601$). With only one training
+environment, fitting the training set better can also mean learning more
+environment-specific details.
+
+\subsection{Contrastive representation}
+The linear probe on the frozen SupCon encoder raises accuracy to
+$\mathbf{53.1\%}$ (validation $58.3\%$): $+4.9$ points and an improvement on
+every set, the largest on $S3$ ($+8.3$, unseen person) and $S7$ ($+5.9$).
+Its confusion matrix (\fig{fig:cm}\,(b)) sharpens running and softens
+$L\!\rightarrow\!E$ ($0.76\!\rightarrow\!0.52$). Fine-tuning then
+hurts, dropping to $48.4\%$: freezing the encoder is what generalizes instead
+fine-tuning re-overfits the one environment.
+
+The t-SNE projection (\fig{fig:tsne}, from the sliding-window run of
+\secref{sec:sliding}) is the most informative diagnostic. Colored by
+environment (right) the points are totally mixed; the
+SupCon objective did reach its design goal of an environment-invariant
+representation. Colored by activity (left) the space splits into a
+static region (empty, sitting) and a moving arc (jumping,
+running, walking), but the activities within each region
+stay partly entangled: contrastive learning removed the domain nuisance
+and exposed a harder, intrinsic limit: a single-antenna $\approx\!2$\,s window
+does not fully separate the activities, whichever way it is encoded.
+Consistently, in both runs the SupCon loss fell only from $\approx\!4.5$ to
+$\approx\!4.3$: the pre-training never fully converged.
+
+With sliding-window data, the SupCon probe reaches $59.5\%$, slightly below the
+$60.1\%$ baseline, and fine-tuning reaches $58.0\%$. Thus, contrastive learning
+helps when training data is limited, but its advantage disappears when many
+more windows are available.
+
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.93\columnwidth]{tsne_slide.png}
@@ -106,16 +115,6 @@ $\approx\!4.3$: the pre-training never fully converged.
   the space is organized by activity, not by environment.}
   \label{fig:tsne}
 \end{figure}
-
-\subsection{Optimizer schedule}
-The slow schedule changes only the learning rate, patience and budget, so the two
-runs isolate that factor. Slowing training down improves accuracy from
-$48.2\%$ to $51.3\%$ ($+3.1$ points, five sets out of six) even though the model
-fits its own training data worse ($0.575$ vs.\ $0.601$ training accuracy): with one training
-environment the two objectives conflict, as
-an epoch spent fitting $S1$ better is an epoch spent memorizing its room, person
-and day. It also tempers the previous result: $+3.1$ of the contrastive
-$+4.9$ points is buyable with an optimizer setting alone.
 
 \subsection{Sliding-window front-end}
 \label{sec:sliding}
@@ -156,24 +155,6 @@ gain: $L$ reaches $0.71$, $L\!\rightarrow\!E$ falls from $0.46$ to $0.27$ next
 to jumping ($0.57\!\rightarrow\!0.73$) and running
 ($0.65\!\rightarrow\!0.80$). Averaging helps only where antennas disagree, and
 denser coverage is what creates that disagreement on low-motion windows.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{perset_accuracy.png}
-  \caption{Cross-domain accuracy per measurement set along the four milestones. 
-  Every unseen set benefits from the
-  sliding window and, on top of it, from antenna fusion.}
-  \label{fig:perset}
-\end{figure}
-
-\subsection{Does contrastive learning still help?}
-Repeating the contrastive stage on the sliding-window data answers a question the
-first experiment could not: the probe now reaches $59.5\%$, $0.6$ point
-below the plain baseline it had beaten by $4.9$, and fine-tuning again
-does worse ($58.0\%$). The stage thus behaves as a data-efficiency
-mechanism more than a domain-invariance one: with $2767$ training windows it buys
-a representation cross-entropy cannot learn; with $31{,}103$ correlated windows
-cross-entropy catches up alone.
 
 \subsection{Comparison with the SHARP paper}
 \tab{tab:compare} places our results next to SHARP~\cite{sharp}: the full

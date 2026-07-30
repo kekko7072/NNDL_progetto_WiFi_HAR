@@ -28,8 +28,7 @@ Supervised Contrastive Learning (SupCon)~\cite{supcon},
 by re-using the receiver diversity the dataset already provides, and by feeding
 the network more of the signal it already has. Every change is implemented and
 measured one at a time, on the same baseline and protocol, so each
-accuracy figure is attributable to one design decision (\tab{tab:versions}). The
-contributions are:
+accuracy figure is attributable to one design decision. The contributions are:
 \begin{itemize}
   \item \textbf{Baseline (M.~Carraro).} A plain reimplementation
   of the dataset pipeline and baseline Inception-style CNN, with a cross-domain
@@ -54,10 +53,3 @@ Combining the last two takes the same architecture from $48.2\%$ to
 $\mathbf{72.7\%}$. We use the full SHARP system~\cite{sharp} as the reference
 upper bound and discuss, quantitatively, which part of the gap each strategy
 removes and which part is left.
-
-\secref{sec:related_work} reviews the related work.
-\secref{sec:processing_architecture} gives a high-level view of the pipeline and
-of the changes we evaluate. \secref{sec:model} details signals and features and
-\secref{sec:learning_framework} the learning frameworks. Results and the
-comparison against SHARP are in \secref{sec:results}, concluding remarks in
-\secref{sec:conclusions}.

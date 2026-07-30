@@ -1,77 +1,5 @@
 % !TEX root = report.tex
 
-\section{Processing Pipeline}
-\label{sec:processing_architecture}
-
-All of our models cast Wi-Fi HAR as the classification of Doppler-spectrogram
-images and share the same data front-end. They differ in how the
-representation is learned and in how the per-window decisions are
-combined. The raw CSI Doppler traces are cut into fixed-size
-windows of shape $1\times340\times100$, one antenna at a time.
-From there the pipeline forks:
-\begin{itemize}
-  \item the \textbf{baseline chain} feeds each window to an
-  Inception-style CNN trained end-to-end with cross-entropy, and reads the
-  activity off the softmax output;
-  \item the \textbf{contrastive chain} first applies
-  domain-randomization augmentations to build two views of each window, pre-trains
-  a deeper batch-normalized encoder with a Supervised Contrastive loss, then
-  freezes the encoder and fits a linear probe on the resulting features;
-  \item the \textbf{fusion stage} sits after either classifier and needs
-  no retraining: the per-antenna class probabilities of the same physical time
-  window are averaged into one decision.
-\end{itemize}
-All chains are trained on a single environment ($S1$) and evaluated under the
-same cross-domain protocol (unseen $S2$--$S7$), so they can be compared on equal
-footing against the reference SHARP system~\cite{sharp} 
-(\secref{sec:learning_framework} details them).
-
-\subsection{The changes we evaluate}
-\label{sec:versions}
-Four modifications were implemented on that skeleton, each isolated so that its
-effect is attributable (\tab{tab:versions}): a windowing strategy, a
-group-aware pipeline enabling decision fusion, a contrastive
-representation and an optimizer schedule. Only the first touches the data
-loader and only the third trains a new network. Fusion is post-processing on an
-unchanged model, which is what makes its gain remarkable. The sliding window and 
-fusion compose into our best configuration.
-
-\begin{table}[t]
-  \centering
-  \caption{The modifications evaluated, the code each required, and their effect
-  on cross-domain accuracy (train on $S1$, test on $S2$--$S7$, one run each).
-  Each is measured against the reference configuration of the first row, or
-  against the same configuration with a sliding front-end.}
-  \label{tab:versions}
-  \setlength{\tabcolsep}{3pt}
-  \footnotesize
-  \begin{tabular}{@{}lp{0.47\columnwidth}r@{}}
-    \toprule
-    Strategy & Implementation & Effect\\
-    \midrule
-    \emph{Reference} &
-      non-overlapping windows (stride $340$, $13{,}564$ windows);
-      reduced-Inception CNN ($128{,}535$ par.); Adam $10^{-3}$, patience $7$
-      & $48.2\%$\\[2pt]
-    Contrastive &
-      augmentations $+$ BN encoder with global average pooling $+$ SupCon loss;
-      linear probe on the frozen encoder
-      & $+4.9$ \newline ($-0.6$ sliding)\\[2pt]
-    Slow schedule &
-      Adam $10^{-4}$, patience $5$, budget $100$; nothing else changes
-      & $+3.1$\\[2pt]
-    Sliding window &
-      stride $30$ ($91\%$ overlap, $152{,}320$ windows); two-pass
-      pre-allocating loader, splits built separately; patience raised to $12$
-      & $+11.9$\\[2pt]
-    Antenna fusion &
-      group id emitted by the loader and carried through the split; softmax and
-      per-group probability average at inference, same weights
-      & $\mathbf{+12.6}$ \newline ($+10.2$ non-ov.)\\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
 \section{Signals and Features}
 \label{sec:model}
 % (Dataset pipeline implemented by M.~Carraro.)
@@ -161,19 +89,11 @@ $128{,}535$ parameters, exactly the count reported for the SHARP
 baseline CNN. Training uses cross-entropy, Adam, mini-batches of $64$ and
 early stopping, restoring the lowest-validation-loss weights.
 
-Three optimizer schedules were compared with architecture, seed, batch
-size and split held fixed, because their effect is counter-intuitive. The
-fast schedule ($\text{lr}=10^{-3}$, patience~$7$,
-budget $40$) stops at epoch~$13$ (best validation loss $0.993$) with the classic
-overfitting signature: training accuracy climbs to $0.601$ while validation
-accuracy plateaus near $0.52$. The slow schedule ($10^{-4}$,
-patience~$5$, budget $100$) runs for $41$ epochs with the two curves almost on
-top of each other and stops at a training accuracy of only $0.575$: the model has
-not yet fitted its own training set. Reading that as underfitting, the
-adopted schedule keeps $10^{-3}$ but raises patience to $12$: a plateau
-no longer ends training prematurely (\fig{fig:training_curves}), which matters at stride~$30$, where each
-epoch is an order of magnitude slower; on that data it reaches $0.750$ training
-accuracy and stops at epoch~$27$.
+We compare a fast schedule (learning rate $10^{-3}$, patience $7$, maximum
+$40$ epochs) with a slow schedule ($10^{-4}$, patience $5$, maximum $100$
+epochs), keeping the model, seed, batch size and split fixed. Sliding-window
+training uses learning rate $10^{-3}$ and patience $12$. In every case, early
+stopping restores the weights with the lowest validation loss.
 
 \subsection{Contrastive extension: Supervised Contrastive Learning}
 \label{sec:contrastive}
@@ -240,8 +160,5 @@ gracefully when a recording provides fewer than four streams. The reference pape
 does not detail its own rule, so \eq{eq:fusion} is a standard instantiation
 rather than a reproduction.
 
-Two details make it correct: the group id must not encode the stream
-index, so the four antennas collide onto one key, and the evaluation
-\texttt{DataLoader} must not shuffle or the probabilities stop lining up with
-the stored ids. Fusion also changes the unit of evaluation: one decision
-per physical time window instead of one per antenna.
+Fusion changes the unit of evaluation from one decision per antenna to one
+decision per physical time window.
