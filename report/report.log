@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.4)  30 JUL 2026 18:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.4)  30 JUL 2026 19:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -793,7 +793,7 @@ e 133.
  [4 <./figures/confusion_overall_c.png> <./figures/cl_confusion_c.png> <./figur
 es/confusion_v4_single_c.png> <./figures/confusion_v4_fused_c.png> <./figures/t
 sne_slide.png> <./figures/training_curves_slide.png>])
-(./conclusions.tex) (./report.bbl
+(./reproducibility.tex) (./conclusions.tex) (./report.bbl
 Underfull \hbox (badness 2065) in paragraph at lines 15--19
 []\OT1/ptm/m/n/8 P. Khosla, P. Teter-wak, C. Wang, A. Sarna, Y. Tian, P. Isola,
 
@@ -818,10 +818,10 @@ L3 programming layer <2026-01-19>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 17014 strings out of 469006
- 344255 string characters out of 5454814
- 737542 words of memory out of 5000000
- 45393 multiletter control sequences out of 15000+600000
+ 17027 strings out of 469006
+ 344586 string characters out of 5454814
+ 737567 words of memory out of 5000000
+ 45403 multiletter control sequences out of 15000+600000
  677479 words of font info for 153 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
  84i,10n,94p,560b,505s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -851,7 +851,7 @@ xlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local
 ive/2026basic/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/
 2026basic/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2026b
 asic/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (5 pages, 611189 bytes).
+Output written on report.pdf (5 pages, 614915 bytes).
 PDF statistics:
  164 PDF objects out of 1000 (max. 8388607)
  92 compressed objects within 1 object stream
