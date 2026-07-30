@@ -3,31 +3,10 @@
 \section{Reproducing the Experiments}
 \label{sec:reproducibility}
 
-Use the following self-contained notebook to reproduce all reported results
-and figures:
-\begin{center}
-  \texttt{NNDL\_project\_Carraro\_Vezzani.ipynb}
-\end{center}
-It downloads the dataset automatically, so no dataset files need to be
-uploaded and no paths need to be edited.
-
-\begin{enumerate}
-  \item Upload or open the notebook in Google Colab.
-  \item Open \emph{Runtime} \(>\) \emph{Change runtime type}, then select
-  Python~3, a T4 GPU, High-RAM, and the latest runtime version.
-  \item Run all cells from top to bottom with \emph{Runtime} \(>\)
-  \emph{Run all}.
-\end{enumerate}
-
-\newpage
-High-RAM is required with the reported \texttt{STRIDE = 30}: the windowed
+The following self-contained notebook downloads the dataset automatically, so no dataset files need to be
+uploaded and no paths need to be edited. High-RAM is required with the reported \texttt{STRIDE = 30}: the windowed
 dataset uses approximately \(20\)~GB at steady state and peaks near \(31\)~GB
-while being built. A standard Colab runtime (approximately \(12\)~GB) will run
-out of memory in Section~2. If High-RAM is unavailable, set
-\texttt{STRIDE = 340} in that section; this uses non-overlapping windows but
+while being built. If High-RAM is unavailable, set \texttt{STRIDE = 340} in section Section~2 of the colab; this uses non-overlapping windows but
 produces fewer training samples and the corresponding lower accuracies.
 
 A complete run on a High-RAM T4 takes approximately \(45\)--\(60\) minutes.
-The notebook fixes the NumPy and PyTorch seeds to \(0\), both initially and
-before contrastive training. Small differences can remain because some CUDA
-kernels are non-deterministic.
