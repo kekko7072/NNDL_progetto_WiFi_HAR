@@ -7,7 +7,7 @@ LATEX      := pdflatex
 BIBTEX     := bibtex
 LATEXFLAGS := -interaction=nonstopmode -halt-on-error
 
-TEXSRC := $(MAIN).tex intro.tex related.tex model.tex results.tex conclusions.tex
+TEXSRC := $(MAIN).tex intro.tex related.tex model.tex results.tex reproducibility.tex conclusions.tex
 FIGS   := $(wildcard figures/*.png figures/*.pdf figures/*.jpg)
 
 # On Windows GNU Make may run under cmd/PowerShell, where `rm` does not exist.
