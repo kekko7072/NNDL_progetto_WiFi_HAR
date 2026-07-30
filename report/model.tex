@@ -118,7 +118,7 @@ which is what makes \secref{sec:fusion} possible. The id travels through the
 split with the labels, and the test \texttt{DataLoader} uses
 \texttt{shuffle=False} to stay aligned with it.
 
-\textbf{A memory-bounded loader.} At $S=30$ the windows no longer fit comfortably 
+\textbf{Memory-bounded loader.} At $S=30$ the windows no longer fit comfortably 
 in a Colab runtime. The rewritten 
 loader makes two passes: the first counts the windows
 each trace will produce, the second fills one pre-allocated \texttt{float32}
@@ -179,62 +179,46 @@ accuracy and stops at epoch~$27$.
 \label{sec:contrastive}
 
 \subsubsection{Motivation and augmentations}
-Following the contrastive / self-supervised direction suggested in the
-project proposal, we implement Supervised
-Contrastive Learning (SupCon)~\cite{supcon}: an encoder is trained so
-that two windows of the same activity are pulled together and windows of
-different activities pushed apart, whatever environment, person or antenna
-they come from; a linear classifier is then fit on the frozen representation
-(linear probe). Each window needs two augmented ``views'' that keep the
-activity intact but perturb nuisance factors, a light domain randomization. All
-transforms run on a whole batch: \textbf{amplitude scaling}
-($\mathcal{U}(0.8,1.2)$, mimicking rooms/distances at different signal
-strength), \textbf{additive Gaussian noise} ($\sigma=0.05$), \textbf{circular
-time shift} ($\pm40$ samples) and \textbf{time/Doppler masking}
-(SpecAugment-style, a zeroed band of $40$ time samples and $15$ velocity bins).
+We use Supervised Contrastive Learning (SupCon)~\cite{supcon} to learn similar
+representations for the same activity and different representations for
+different activities, regardless of person, environment or antenna. Two
+augmented views are created from each window using amplitude scaling
+($\mathcal{U}(0.8,1.2)$), Gaussian noise ($\sigma=0.05$), circular time shifts
+($\pm40$ samples), and time/Doppler masking ($40$ time samples and $15$
+velocity bins). After pre-training, the encoder is frozen and a linear
+classifier is trained on its output.
 
 \subsubsection{Encoder and projection head}
-The encoder $f(\cdot)$ is a deeper, batch-normalized evolution of the baseline's
-Inception block: the same three-branch front-end (concatenated to $41$ channels)
-plus (i) batch normalization after every convolution, (ii) a $1\times1$ reduction
-to $32$ channels, (iii) a second downsampling stage
-($32\!\rightarrow\!64\!\rightarrow\!128$, output $128\times43\times13$) and
-(iv) global average pooling, which replaces the baseline's large
-flatten$\rightarrow$dense layer with a fixed $128$-d representation $h$
-that has fewer parameters and is more shift-robust. An MLP projection head
-$g(\cdot)$ ($128\!\rightarrow\!128\!\rightarrow\!128$, ReLU) maps $h$ to an
-$L_2$-normalized $\bm{z}=g(h)$; as prescribed by SupCon the loss is applied to
-$\bm{z}$ and the head is discarded afterwards, so classification uses $h$.
-The whole model has $130{,}952$ parameters against the baseline's $128.5$k.
+The encoder extends the baseline's three-branch Inception block with batch
+normalization, a $1\times1$ reduction to $32$ channels and a second
+downsampling stage ($32\!\rightarrow\!64\!\rightarrow\!128$). Global average
+pooling produces a $128$-dimensional representation $h$. A projection head
+($128\!\rightarrow\!128\!\rightarrow\!128$) maps $h$ to a normalized vector
+$\bm{z}$ for the SupCon loss. The head is removed after pre-training, so the
+classifier uses $h$. The model has $130{,}952$ parameters.
 
 \subsubsection{SupCon loss}
-For a batch of $L_2$-normalized embeddings with labels, each anchor $i$ attracts
-every other sample sharing its label (its positive set $P(i)$) and repels all
-others, through a temperature-scaled softmax over cosine similarities:
+For each sample $i$, the loss pulls it closer to samples with the same label,
+denoted by $P(i)$, and pushes it away from samples with different labels:
 \begin{equation}
 \label{eq:supcon}
 \mathcal{L}=\frac{1}{|I|}\sum_{i\in I}\frac{-1}{|P(i)|}\sum_{p\in P(i)}
 \log\frac{\exp(\bm{z}_i\!\cdot\!\bm{z}_p/\tau)}
 {\sum_{a\neq i}\exp(\bm{z}_i\!\cdot\!\bm{z}_a/\tau)},
 \end{equation}
-where $I$ is the set of anchors with at least one same-class positive and
-$\tau=0.07$. Unlike self-supervised SimCLR~\cite{simclr}, using the labels makes
-all same-activity windows in the batch positives, even those from
-different files or environments, which turns generic contrastive learning into
-an environment-invariant activity representation.
+where $I$ contains samples with a same-label partner and $\tau=0.07$. Unlike
+SimCLR~\cite{simclr}, SupCon uses labels, so same-activity windows from
+different environments are also treated as positive pairs.
 
 \subsubsection{Training and evaluation protocol}
-Everything uses the same $S1$-based split as the baseline. In
-\textbf{pre-training} each batch is expanded into two augmented views and encoder
-and head are trained jointly with Adam (weight decay~$10^{-4}$) for up to $30$
-epochs with early stopping on the validation contrastive loss. The \textbf{linear
-probe} then freezes the encoder, pre-computes and standardizes the embeddings and
-trains a single $\mathrm{Linear}(128,5)$ layer with cross-entropy, isolating the
-quality of the representation, while \textbf{fine-tuning} unfreezes
-everything at lr~$10^{-4}$. A t-SNE projection of the test embeddings, colored by
-activity and by environment, is the invariance diagnostic. The contrastive and
-probe learning rates were $10^{-3}$ on the non-overlapping data and $10^{-4}$ on
-the sliding-window data.
+We use the same $S1$-based split as the baseline. The encoder and projection
+head are pre-trained with Adam for up to $30$ epochs, using weight decay
+$10^{-4}$ and early stopping. The linear probe freezes the encoder and trains a
+$\mathrm{Linear}(128,5)$ classifier. Fine-tuning instead updates the full model
+at learning rate $10^{-4}$. A t-SNE plot checks whether the learned groups
+depend on activity rather than environment. Pre-training and probe learning
+rates are $10^{-3}$ for non-overlapping windows and $10^{-4}$ for sliding
+windows.
 
 \subsection{Multi-antenna decision fusion}
 \label{sec:fusion}

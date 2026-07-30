@@ -3,29 +3,12 @@
 \section{Concluding Remarks}
 \label{sec:conclusions}
 
-Starting from a baseline Wi-Fi HAR pipeline under a strict cross-domain protocol
-($48.2\%$ on unseen environments), we implemented and measured four strategies
-one at a time: a supervised-contrastive representation ($+4.9$), a slower
-optimizer schedule ($+3.1$), an overlapping sliding window ($+11.9$) and
-multi-antenna soft decision fusion ($+12.6$). The last two compose and take
-the same $128{,}535$-parameter
-network to $\mathbf{72.7\%}$, above the single-component ablation of the
-reference system~\cite{sharp} on every unseen set, at almost no training
-cost; a stride constant and a probability average over receiver diversity the
-dataset already contains. The contrastive encoder is conditional: a
-data-efficiency mechanism, not a front-end substitute. Still missing: the
-strongest-path sanitization behind most of the remaining gap, multi-seed runs,
-and fusion on top of the frozen probe with the contrastive stage re-tuned at
-$10^{-3}$.
-
-
-\emph{What we learned and difficulties encountered}.
-The strict environment-based split explains the modest numbers: never seeing
-the test environment is an honest cost a random split would hide. Three
-results were counter-intuitive: training less well generalized
-better, fine-tuning the contrastive encoder hurt, and the
-largest gains came from the two cheapest changes once the pipeline carried a
-group identifier. The main difficulties were getting SupCon pre-training to
-converge (the loss barely moved), run-to-run variance on one environment, and
-the memory cost of overlapping windows, which forced a pre-allocating loader
-before the overlap front-end could run.
+Under strict testing on unseen environments, the baseline achieved $48.2\%$
+accuracy. Supervised contrastive learning, a slower training schedule,
+overlapping windows and multi-antenna fusion all improved the performance. The
+largest gains came from overlapping windows and antenna fusion, which together
+raised accuracy to $\mathbf{72.7\%}$ without changing the baseline network.
+Contrastive pre-training also helped when the encoder was kept frozen, but
+fine-tuning reduced its benefit. Overall, using more of the available temporal
+and antenna information was the simplest and most effective way to improve
+cross-environment activity recognition.

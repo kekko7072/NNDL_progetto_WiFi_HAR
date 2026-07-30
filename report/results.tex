@@ -185,30 +185,3 @@ unseen set, by $10.4$ ($S7$) to $27.2$ points ($S5$), with the largest margins
 exactly where it collapses, that is the blocked-line-of-sight sets. The residual
 $\sim\!26$-point gap to full SHARP is thus concentrated in the one ingredient we
 do not implement.
-
-\subsection{Discussion}
-\label{sec:discussion}
-
-\paragraph{What each change bought}
-Ranked by measured effect, decision fusion ($+12.6$) and the sliding window
-($+11.9$) dominate the contrastive representation ($+4.9$, $-0.6$ once data is
-plentiful) and the optimizer schedule ($+3.1$). That ordering is a finding: the
-two cheapest changes, a stride constant and a few lines of post-processing, beat
-the one that cost the most design effort, and they compose, taking the
-same network from $48.2\%$ to $72.7\%$.
-
-\paragraph{Why we are still far from SHARP}
-The gap is essentially one component. SHARP uses the strongest multipath
-component as phase reference, and its ablation shows the standard
-reference-antenna method makes the same CNN collapse to $39$--$60\%$
-(\tab{tab:compare}, last column). Our best model sits $10$ to $27$ points
-above that ablation: we reproduced the decision-level half of SHARP's
-robustness and improved the data side, but none of its signal-processing half.
-
-\paragraph{Where representation learning fits}
-The SupCon stage attacks domain shift on the representation axis and, as
-the t-SNE shows, succeeds but its advantage evaporates once the front-end
-supplies ten times more windows. It is therefore worth its complexity when
-labelled windows are scarce, the realistic setting for a deployment with one
-calibration environment whereas in the data-rich regime the effort is better spent on
-the front-end and the decision rule.
